@@ -1,6 +1,6 @@
 import {createElement} from '../js/utils.js';
 
-const menuTemplate = (movies) => {
+const createMenuTemplate = (movies) => {
   const watchListAmount = movies.filter((movie) => movie.isInWatchList === true);
   const watchedAmount = movies.filter((movie) => movie.isWatched === true);
   const isFavourite = movies.filter((movie) => movie.isFavourite === true);
@@ -23,7 +23,7 @@ class Menu {
   }
 
   getTemplate() {
-    return menuTemplate(this._movies);
+    return createMenuTemplate(this._movies);
   }
 
   getElement() {

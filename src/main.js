@@ -7,6 +7,7 @@ import UserProfileView from './view/user-profile.js';
 import MovieDetailsView from './view/film-details.js';
 import SortView from './view/sort.js';
 import StatisticsView from './view/statistics.js';
+import EmptyFilmListView from './view/empty-list.js';
 import {render, RenderPosition} from './js/utils.js';
 
 // ===========================================================
@@ -58,7 +59,6 @@ const renderMovieDetails = (movie) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       closeMovieDetailsPopup();
-      document.removeEventListener('keydown', onEscKeyDown);
     }
   }
 
@@ -80,9 +80,7 @@ const renderMovieCards = (container, movie) => {
     renderMovieDetails(movie);
   };
 
-  movieCard.getElement().querySelector('.film-card__title').addEventListener('click', showMovieDetailsPopup);
-  movieCard.getElement().querySelector('.film-card__poster').addEventListener('click', showMovieDetailsPopup);
-  movieCard.getElement().querySelector('.film-card__comments').addEventListener('click', showMovieDetailsPopup);
+  movieCard.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments').forEach((element) => element.addEventListener('click', showMovieDetailsPopup));
 
   render(container, movieCard.getElement(), RenderPosition.BEFOREEND);
 };
@@ -94,6 +92,12 @@ const renderSite = () => {
   render(headerElement, new UserProfileView().getElement(), RenderPosition.BEFOREEND);
   render(mainElement, new MenuTemplateView(moviesMock).getElement(), RenderPosition.AFTERBEGIN);
   render(mainElement, new SortView().getElement(), RenderPosition.BEFOREEND);
+
+  if(moviesMock.length === 0) {
+    render(mainElement, new EmptyFilmListView.getElement(), RenderPosition.BEFOREEND);
+    return;
+  }
+
   render(mainElement, new FilmListView().getElement(), RenderPosition.BEFOREEND);
   render(footerElement, new StatisticsView().getElement(), RenderPosition.BEFOREEND);
 

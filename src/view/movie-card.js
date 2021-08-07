@@ -1,6 +1,6 @@
 import {createElement} from '../js/utils.js';
 
-const movieCardTemplate = (filmCard) => {
+const createMovieCardTemplate = (filmCard) => {
   const {name, rating, details, duration, genre, description, comments, poster, isInWatchList, isWatched, isFavourite} = filmCard;
 
   const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('YYYY');
@@ -31,7 +31,7 @@ class MovieCard {
   }
 
   getTemplate() {
-    return movieCardTemplate(this._movie);
+    return createMovieCardTemplate(this._movie);
   }
 
   getElement() {

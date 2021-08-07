@@ -1,6 +1,6 @@
 import {createElement} from '../js/utils.js';
 
-const filmDetailsTemplate = (movie) => {
+const createFilmDetailsTemplate = (movie) => {
   const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details} = movie;
 
   const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
@@ -16,8 +16,8 @@ const filmDetailsTemplate = (movie) => {
   const renderDetailsComment = (commentsList) => {
     let result = '';
     for (const value of commentsList) {
-      result = `${result} +
-      <li class="film-details__comment">
+      result +=
+      `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${value.emotion}.png" width="55" height="55" alt="emoji-smile">
       </span>
@@ -157,7 +157,7 @@ class MovieDetails {
   }
 
   getTemplate() {
-    return filmDetailsTemplate(this._movie);
+    return createFilmDetailsTemplate(this._movie);
   }
 
   getElement() {

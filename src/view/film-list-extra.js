@@ -1,6 +1,6 @@
 import {createElement} from '../js/utils.js';
 
-const filmListExtraTemplate = (block) => {
+const createFilmListExtraTemplate = (block) => {
   const {name} = block;
   return `<section class="films-list films-list--extra">
             <h2 class="films-list__title">${name}</h2>
@@ -16,7 +16,7 @@ class MovieListExtra {
   }
 
   getTemplate() {
-    return filmListExtraTemplate(this._block);
+    return createFilmListExtraTemplate(this._block);
   }
 
   getElement() {

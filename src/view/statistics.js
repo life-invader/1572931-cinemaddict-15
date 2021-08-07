@@ -1,6 +1,6 @@
 import {createElement} from '../js/utils.js';
 
-const statisticsTemplate = () => '<p>130 291 movies inside</p>';
+const createStatisticsTemplate = () => '<p>130 291 movies inside</p>';
 
 class Statistics {
   constructor() {
@@ -8,7 +8,7 @@ class Statistics {
   }
 
   getTemplate() {
-    return statisticsTemplate();
+    return createStatisticsTemplate();
   }
 
   getElement() {
