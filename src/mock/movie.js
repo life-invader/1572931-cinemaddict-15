@@ -1,21 +1,7 @@
-import 'dayjs';
 import dayjs from 'dayjs';
-
-// Генерация чисел
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-const randomFloat = (a = 10, b = 1) => {
-  const lower = Math.min(a, b);
-  const upper = Math.max(a, b);
-  const number = (lower + Math.random() * (upper - lower)).toFixed(1);
-  return String(number).endsWith('0') ? Number(number).toFixed() : Number(number).toFixed(1);
-};
-// ==============================================
+import objectSupport from 'dayjs/plugin/objectSupport';
+import {getRandomInteger, randomFloat} from '../js/utils.js';
+dayjs.extend(objectSupport);
 
 const MIN_COMMENTS_AMOUNT = 0;
 const MAX_COMMENTS_AMOUNT = 5;
@@ -138,13 +124,12 @@ const generateMovieDuration = () => {
   return `${hours}h ${minutes}m`;
 };
 
-const generateMovieYear = () => getRandomInteger(1900, 1999);
-
 const generateReleaseDate = () => {
   const releaseYear = getRandomInteger(MIN_RELEASE_YEAR, MAX_RELEASE_YEAR).toString();
   const releaseMonth = getRandomInteger(MIN_RELEASE_MONTH, MAX_RELEASE_MONTH).toString();
   const releaseDay = getRandomInteger(MIN_RELEASE_DAY, MAX_RELEASE_DAY).toString();
-  const date = dayjs(`${releaseMonth} ${releaseDay} ${releaseYear}`).format('DD MMMM YYYY');
+  const date = dayjs({year: releaseYear, month: releaseMonth, day: releaseDay});
+
   return date;
 };
 
@@ -253,7 +238,6 @@ const generateMovie = () => (
     genre: generateGenre(),
     rating: generateMovieRating(),
     duration: generateMovieDuration(),
-    year: generateMovieYear(),
     poster: generatePoster(),
     description: generateDescription(),
     comments: generateComment(),

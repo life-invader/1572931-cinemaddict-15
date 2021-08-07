@@ -1,14 +1,14 @@
 import {createElement} from '../js/utils.js';
 
-const showMoreButtonTemplate = () => '<button class="films-list__show-more">Show more</button>';
+const statisticsTemplate = () => '<p>130 291 movies inside</p>';
 
-class ShowMoreButton {
+class Statistics {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return showMoreButtonTemplate();
+    return statisticsTemplate();
   }
 
   getElement() {
@@ -23,4 +23,4 @@ class ShowMoreButton {
   }
 }
 
-export default ShowMoreButton;
+export default Statistics;

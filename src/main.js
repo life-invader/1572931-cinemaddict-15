@@ -1,90 +1,141 @@
-import filmListExtraTemplate from './view/film-list-extra.js';
-import filmListTemplate from './view/film-list.js';
-import menuTemplate from './view/menu.js';
-import movieCardTemplate from './view/movie-card.js';
-import showMoreButtonTemplate from './view/show-more-button.js';
-import userProfileTemplate from './view/user-profile.js';
-import filmDetailsTemplate from './view/film-details.js';
-import renderlayoutTemplate from './js/utils.js';
+import MovieListExtra from './view/film-list-extra.js';
+import FilmListView from './view/film-list.js';
+import MenuTemplateView from './view/menu.js';
+import MovieCardView from './view/movie-card.js';
+import ShowMoreButtonView from './view/show-more-button.js';
+import UserProfileView from './view/user-profile.js';
+import MovieDetailsView from './view/film-details.js';
+import SortView from './view/sort.js';
+import StatisticsView from './view/statistics.js';
+import {render, RenderPosition} from './js/utils.js';
 
 // ===========================================================
 
 import {generateMovie} from './mock/movie.js';
-let moviesMock = new Array(25).fill(null).map(generateMovie);
+// Изначальный массив фильмов
+const moviesMock = new Array(25).fill(null).map(generateMovie);
+// Его копия, с которой работают кнопки сортировки и фильтрации
+const moviesMockCopy = moviesMock.slice();
 
 // ===========================================================
 
 const MOVIE_CARD_COUNT = 5;
 const MOVIE_CARD_COUNT_EXTRA = 2;
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
+const EXTRA_MOVIES_BLOCKS = [
+  {
+    name: 'Top rated',
+    getMovies() {
+      return moviesMockCopy.sort((a, b) => b.rating - a.rating);
+    },
+  },
+  {
+    name: 'Most commented',
+    getMovies() {
+      return moviesMockCopy.sort((a, b) => b.comments.length - a.comments.length);
+    },
+  },
+];
 
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');
 
-renderlayoutTemplate(headerElement, userProfileTemplate(), 'beforeend');
-renderlayoutTemplate(mainElement, menuTemplate(moviesMock), 'afterbegin');
-renderlayoutTemplate(mainElement, filmListTemplate(), 'beforeend');
+// ===========================================================
+// Функция рендера поп-ап'а
+const renderMovieDetails = (movie) => {
+  document.body.classList.add('hide-overflow');
+  const movieDetails = new MovieDetailsView(movie);
 
-const filmsListContainer = document.querySelector('.films-list__container');
+  function closeMovieDetailsPopup() {
+    document.body.classList.remove('hide-overflow');
+    movieDetails.getElement().remove();
+    movieDetails.removeElement();
+    document.removeEventListener('keydown', onEscKeyDown);
+  }
 
-// Функция открытия поп-ап'а
-const openMovieDetailsPopup = (movie) => {
-  const filmCard = document.querySelector('.film-card:last-child');
-  filmCard.addEventListener('click', (evt) => {
-    if (document.body.classList.contains('modal-open')) {
+  function onEscKeyDown(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      closeMovieDetailsPopup();
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
+  }
+
+  movieDetails.getElement().querySelector('.film-details__close-btn').addEventListener('click', closeMovieDetailsPopup);
+  document.addEventListener('keydown', onEscKeyDown);
+
+  render(footerElement, movieDetails.getElement(), RenderPosition.BEFOREEND);
+};
+
+// Функция рендера карточек фильма
+const renderMovieCards = (container, movie) => {
+  const movieCard = new MovieCardView(movie);
+
+  const showMovieDetailsPopup = (evt) => {
+    evt.preventDefault();
+    if (document.body.classList.contains('hide-overflow')) {
       return;
     }
-    if (evt.target.classList.contains('film-card__title') || evt.target.classList.contains('film-card__poster')) {
-      document.body.classList.add('modal-open');
-      renderlayoutTemplate(footerElement, filmDetailsTemplate(movie), 'beforeend');
-      const closePopupButton = document.querySelector('.film-details__close-btn');
+    renderMovieDetails(movie);
+  };
 
-      const filmDetails = document.querySelector('.film-details');
-      closePopupButton.addEventListener('click', () => {
-        document.body.classList.remove('modal-open');
-        filmDetails.remove();
-      });
+  movieCard.getElement().querySelector('.film-card__title').addEventListener('click', showMovieDetailsPopup);
+  movieCard.getElement().querySelector('.film-card__poster').addEventListener('click', showMovieDetailsPopup);
+  movieCard.getElement().querySelector('.film-card__comments').addEventListener('click', showMovieDetailsPopup);
+
+  render(container, movieCard.getElement(), RenderPosition.BEFOREEND);
+};
+
+// ===========================================================
+
+// Функция отрисовки всего остального
+const renderSite = () => {
+  render(headerElement, new UserProfileView().getElement(), RenderPosition.BEFOREEND);
+  render(mainElement, new MenuTemplateView(moviesMock).getElement(), RenderPosition.AFTERBEGIN);
+  render(mainElement, new SortView().getElement(), RenderPosition.BEFOREEND);
+  render(mainElement, new FilmListView().getElement(), RenderPosition.BEFOREEND);
+  render(footerElement, new StatisticsView().getElement(), RenderPosition.BEFOREEND);
+
+  const filmsListContainer = document.querySelector('.films-list__container');
+  const filmsContainer = document.querySelector('.films-list');
+
+  render(filmsContainer, new ShowMoreButtonView().getElement(), RenderPosition.BEFOREEND);
+
+  const showMoreMoviesButton = document.querySelector('.films-list__show-more');
+
+  // Отрисовка первых 5 карточек фильмов
+  moviesMockCopy
+    .slice(0, MOVIE_CARD_COUNT)
+    .forEach((movie) => renderMovieCards(filmsListContainer, movie));
+
+  // Показ следующих пяти фильмов
+  showMoreMoviesButton.addEventListener('click', () => {
+    moviesMockCopy
+      .slice(filmsListContainer.children.length, filmsListContainer.children.length + SHOW_MORE_MOVIES_BUTTON_STEP)
+      .forEach((movie) => renderMovieCards(filmsListContainer, movie));
+    if (filmsListContainer.children.length >= moviesMockCopy.length) {
+      showMoreMoviesButton.classList.add('visually-hidden');
     }
+  });
+
+  // Показ дополнительных блоков 'Top rated' и 'Most commented'
+  const filmsElement = document.querySelector('.films');
+
+  EXTRA_MOVIES_BLOCKS.forEach((extraBlock) => {
+    const extraBlockTemplate = new MovieListExtra(extraBlock);
+    render(filmsElement, extraBlockTemplate.getElement(), RenderPosition.BEFOREEND);
+    const insertPlace = extraBlockTemplate.getElement().querySelector('.films-list__container');
+    const movies = extraBlock.getMovies();
+    movies
+      .slice(0, MOVIE_CARD_COUNT_EXTRA)
+      .forEach((movie) => renderMovieCards(insertPlace, movie));
   });
 };
 
-// Отрисовка первых 5 карточек фильмов
-for (const value of moviesMock.slice(0, MOVIE_CARD_COUNT)) {
-  renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-  openMovieDetailsPopup(value);
-}
+renderSite();
 
-const filmsContainer = document.querySelector('.films-list');
-
-renderlayoutTemplate(filmsContainer, showMoreButtonTemplate(), 'beforeend');
-
-const showMoreMoviesButton = document.querySelector('.films-list__show-more');
-
-showMoreMoviesButton.addEventListener('click', () => {
-  const showMoreMoviesArray = moviesMock.slice(filmsListContainer.children.length, filmsListContainer.children.length + SHOW_MORE_MOVIES_BUTTON_STEP);
-  for (const value of showMoreMoviesArray) {
-    renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-    openMovieDetailsPopup(value);
-  }
-  if (filmsListContainer.children.length >= moviesMock.length) {
-    showMoreMoviesButton.classList.add('visually-hidden');
-  }
-});
-
-const filmsElement = document.querySelector('.films');
-
-renderlayoutTemplate(filmsElement, filmListExtraTemplate(), 'beforeend');
-renderlayoutTemplate(filmsElement, filmListExtraTemplate(), 'beforeend');
-
-const filmsExtraElement = Array.from(document.querySelectorAll('.films-list--extra .films-list__container')); // All
-
-filmsExtraElement.forEach((element) => {
-  for (let i = 0; i < MOVIE_CARD_COUNT_EXTRA; i++) {
-    renderlayoutTemplate(element, movieCardTemplate(moviesMock[i]), 'beforeend');
-  }
-});
-
+/*
 // СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА
 // Сортировка по дате
 const renderByDate = (evt) => {
@@ -96,16 +147,17 @@ const renderByDate = (evt) => {
   });
 
   evt.target.classList.add('sort__button--active');
-  moviesMock.sort((a, b) => b.year - a.year);
+  moviesMockCopy.sort((a, b) => Number(b.details.releaseDate.format('YYYY')) - Number(a.details.releaseDate.format('YYYY')));
+
+  const length = filmsListContainer.children.length;
 
   const array1 = Array.from(filmsListContainer.children);
   for (const value of array1) {
     value.remove();
   }
 
-  for (const value of moviesMock.slice(0, MOVIE_CARD_COUNT)) {
-    renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-    openMovieDetailsPopup(value);
+  for (const value of moviesMockCopy.slice(0, length)) {
+    renderMovieCards(filmsListContainer, value);
   }
 };
 
@@ -121,16 +173,17 @@ const renderByRating = (evt) => {
     button.classList.remove('sort__button--active');
   });
   evt.target.classList.add('sort__button--active');
-  moviesMock.sort((a, b) => b.rating - a.rating);
+  moviesMockCopy.sort((a, b) => b.rating - a.rating);
+
+  const length = filmsListContainer.children.length;
 
   const array1 = Array.from(filmsListContainer.children);
   for (const value of array1) {
     value.remove();
   }
 
-  for (const value of moviesMock.slice(0, MOVIE_CARD_COUNT)) {
-    renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-    openMovieDetailsPopup(value);
+  for (const value of moviesMockCopy.slice(0, length)) {
+    renderMovieCards(filmsListContainer, value);
   }
 };
 
@@ -139,35 +192,31 @@ sortByRatingButton.addEventListener('click', renderByRating);
 
 
 // Сортировка по дефолту
-const renderDefault = () => {
-  const defaultMoviesMock = moviesMock.slice();
+const renderDefaultInner = (evt) => {
+  evt.preventDefault();
+  const sortItems = document.querySelectorAll('.sort__button');
 
-  const renderDefaultInner = (evt) => {
-    evt.preventDefault();
-    const sortItems = document.querySelectorAll('.sort__button');
+  sortItems.forEach((button) => {
+    button.classList.remove('sort__button--active');
+  });
+  evt.target.classList.add('sort__button--active');
 
-    sortItems.forEach((button) => {
-      button.classList.remove('sort__button--active');
-    });
-    evt.target.classList.add('sort__button--active');
+  const length = filmsListContainer.children.length;
 
-    moviesMock = defaultMoviesMock.slice();
+  const array1 = Array.from(filmsListContainer.children);
+  for (const value of array1) {
+    value.remove();
+  }
 
-    const array1 = Array.from(filmsListContainer.children);
-    for (const value of array1) {
-      value.remove();
-    }
+  moviesMockCopy = moviesMock.slice();
 
-    for (const value of defaultMoviesMock.slice(0, MOVIE_CARD_COUNT)) {
-      renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-      openMovieDetailsPopup(value);
-    }
-  };
-
-  const sortDefaultButton = document.querySelector('.sort__button-default');
-  sortDefaultButton.addEventListener('click', renderDefaultInner);
+  for (const value of moviesMock.slice(0, length)) {
+    renderMovieCards(filmsListContainer, value);
+  }
 };
-renderDefault();
+
+const sortDefaultButton = document.querySelector('.sort__button-default');
+sortDefaultButton.addEventListener('click', renderDefaultInner);
 
 // ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ ФИЛЬТРЫ
 const allMoviesButton = document.querySelector('.main-navigation__item-all');
@@ -183,17 +232,18 @@ watchlistButton.addEventListener('click', (evt) => {
     button.classList.remove('main-navigation__item--active');
   });
   evt.target.classList.add('main-navigation__item--active');
+  showMoreMoviesButton.classList.remove('visually-hidden');
 
-  const moviesInWatchlist = moviesMock.filter((movie) => movie.isInWatchList);
+  moviesMockCopy = moviesMock.filter((movie) => movie.isInWatchList);
 
   const array1 = Array.from(filmsListContainer.children);
   for (const value of array1) {
     value.remove();
   }
 
-  for (const value of moviesInWatchlist.slice(0, MOVIE_CARD_COUNT)) {
-    renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-    openMovieDetailsPopup(value);
+  for (const value of moviesMockCopy.slice(0, MOVIE_CARD_COUNT)) {
+    render(filmsListContainer, new MovieCardView(value).getElement(), RenderPosition.BEFOREEND);
+    renderMovieCards(filmsListContainer, value);
   }
 });
 
@@ -204,17 +254,17 @@ historyButton.addEventListener('click', (evt) => {
     button.classList.remove('main-navigation__item--active');
   });
   evt.target.classList.add('main-navigation__item--active');
+  showMoreMoviesButton.classList.remove('visually-hidden');
 
-  const watchedMovies = moviesMock.filter((movie) => movie.isWatched);
+  moviesMockCopy = moviesMock.filter((movie) => movie.isWatched);
 
   const array1 = Array.from(filmsListContainer.children);
   for (const value of array1) {
     value.remove();
   }
 
-  for (const value of watchedMovies.slice(0, MOVIE_CARD_COUNT)) {
-    renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-    openMovieDetailsPopup(value);
+  for (const value of moviesMockCopy.slice(0, MOVIE_CARD_COUNT)) {
+    renderMovieCards(filmsListContainer, value);
   }
 });
 
@@ -225,17 +275,17 @@ favouritesButton.addEventListener('click', (evt) => {
     button.classList.remove('main-navigation__item--active');
   });
   evt.target.classList.add('main-navigation__item--active');
+  showMoreMoviesButton.classList.remove('visually-hidden');
 
-  const favouriteMovies = moviesMock.filter((movie) => movie.isFavourite);
+  moviesMockCopy = moviesMock.filter((movie) => movie.isFavourite);
 
   const array1 = Array.from(filmsListContainer.children);
   for (const value of array1) {
     value.remove();
   }
 
-  for (const value of favouriteMovies.slice(0, MOVIE_CARD_COUNT)) {
-    renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-    openMovieDetailsPopup(value);
+  for (const value of moviesMockCopy.slice(0, MOVIE_CARD_COUNT)) {
+    renderMovieCards(filmsListContainer, value);
   }
 });
 
@@ -246,14 +296,17 @@ allMoviesButton.addEventListener('click', (evt) => {
     button.classList.remove('main-navigation__item--active');
   });
   evt.target.classList.add('main-navigation__item--active');
+  showMoreMoviesButton.classList.remove('visually-hidden');
 
   const array1 = Array.from(filmsListContainer.children);
   for (const value of array1) {
     value.remove();
   }
 
-  for (const value of moviesMock.slice(0, MOVIE_CARD_COUNT)) {
-    renderlayoutTemplate(filmsListContainer, movieCardTemplate(value), 'beforeend');
-    openMovieDetailsPopup(value);
+  moviesMockCopy = moviesMock.slice();
+
+  for (const value of moviesMockCopy.slice(0, MOVIE_CARD_COUNT)) {
+    renderMovieCards(filmsListContainer, value);
   }
 });
+*/
