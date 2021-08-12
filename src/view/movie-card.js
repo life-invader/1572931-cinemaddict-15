@@ -1,4 +1,4 @@
-import {createElement} from '../js/utils.js';
+import AbstractView from './abstract.js';
 
 const createMovieCardTemplate = (filmCard) => {
   const {name, rating, details, duration, genre, description, comments, poster, isInWatchList, isWatched, isFavourite} = filmCard;
@@ -24,25 +24,25 @@ const createMovieCardTemplate = (filmCard) => {
           </article>`;
 };
 
-class MovieCard {
+class MovieCard extends AbstractView {
   constructor(movie) {
-    this._element = null;
+    super();
     this._movie = movie;
+    this._setMovieCardClick = this._setMovieCardClick.bind(this);
   }
 
   getTemplate() {
     return createMovieCardTemplate(this._movie);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _setMovieCardClick(evt) {
+    evt.preventDefault();
+    this._callback.setMovieCardClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setMovieCardClick(callback) {
+    this._callback.setMovieCardClick = callback;
+    this.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments').forEach((element) => element.addEventListener('click', this._setMovieCardClick));
   }
 }
 

@@ -22,7 +22,7 @@ const MAX_MINUTES_AMOUNT = 59;
 const MIN_HOURS_AMOUNT = 1;
 const MAX_HOURS_AMOUNT = 23;
 
-const firstNames = [
+const FIRST_NAMES = [
   'Erik',
   'Morris',
   'Brian',
@@ -35,7 +35,7 @@ const firstNames = [
   'Kennedy',
 ];
 
-const lastNames = [
+const LAST_NAMES = [
   'Peter',
   'Jones',
   'Ross',
@@ -48,7 +48,7 @@ const lastNames = [
   'Frederick',
 ];
 
-const genres = [
+const GENRES = [
   'Musical',
   'Western',
   'Drama',
@@ -57,62 +57,89 @@ const genres = [
   'Mystery',
 ];
 
+const MOVIE_NAME_MOCK = [
+  'Made for each other',
+  'Popeye meets Sinbad',
+  'Sagebrush trail',
+  'Santa-Claus conquers the martians',
+  'The dance of life',
+  'The great Flamarion',
+  'The man with the golden gun',
+];
+
+const MOVIE_DESCRIPTION_MOCK = [
+  'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
+  'Aliquam erat volutpat.',
+  'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
+  'Nunc fermentum tortor ac porta dapibus.',
+  'Sed sed nisi sed augue convallis suscipit in sed felis.',
+];
+
+const POSTER_DIRECTORY = './images/posters/';
+
+const POSTER_NAMES = [
+  'sagebrush-trail.jpg',
+  'santa-claus-conquers-the-martians.jpg',
+  'the-dance-of-life.jpg',
+  'the-great-flamarion.jpg',
+  'the-man-with-the-golden-arm.jpg',
+  'made-for-each-other.png',
+  'popeye-meets-sinbad.png',
+];
+
+const COMMENTS_MOCK = [
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  'Cras aliquet varius magna, non porta ligula feugiat eget.',
+  'Fusce tristique felis at fermentum pharetra.',
+  'Aliquam id orci ut lectus varius viverra.',
+  'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
+];
+
+const COMMENT_EMOTIONS = [
+  'angry',
+  'puke',
+  'sleeping',
+  'smile',
+];
+
+const COMMENT_AUTHOR = [
+  'Tim Macoveev',
+  'John Doe',
+];
+
+const countries = [
+  'USA',
+  'France',
+  'Germany',
+  'England',
+  'Italy',
+  'India',
+];
+
 const getRandomArrayProperty = (array) => {
   const index = getRandomInteger(0, array.length - 1);
   return array[index];
 };
 
 const generateGenre = () => {
-  const index = getRandomInteger(0, genres.length - 1);
-  return genres[index];
+  const index = getRandomInteger(0, GENRES.length - 1);
+  return GENRES[index];
 };
 
 const generateMovieName = () => {
-  const movieNameMock = [
-    'Made for each other',
-    'Popeye meets Sinbad',
-    'Sagebrush trail',
-    'Santa-Claus conquers the martians',
-    'The dance of life',
-    'The great Flamarion',
-    'The man with the golden gun',
-  ];
-
-  const index = getRandomInteger(0, movieNameMock.length - 1);
-  return movieNameMock[index];
+  const index = getRandomInteger(0, MOVIE_NAME_MOCK.length - 1);
+  return MOVIE_NAME_MOCK[index];
 };
 
 const generateDescription = () => {
-  const descriptionMock = [
-    'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
-    'Aliquam erat volutpat.',
-    'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
-    'Nunc fermentum tortor ac porta dapibus.',
-    'Sed sed nisi sed augue convallis suscipit in sed felis.',
-  ];
-
-  const movieDescription = [];
-  for (let i = 0; i < getRandomInteger(1, 5); i++) {
-    const description = descriptionMock[getRandomInteger(0, descriptionMock.length - 1)];
-    movieDescription.push(description);
-  }
+  const index = getRandomInteger(1, 5);
+  const movieDescription = Array.from({length: index}, () => MOVIE_DESCRIPTION_MOCK[getRandomInteger(0, MOVIE_DESCRIPTION_MOCK.length - 1)]);
   return movieDescription.join(' ');
 };
 
 const generatePoster = () => {
-  const directory = './images/posters/';
-  const posterNames = [
-    'sagebrush-trail.jpg',
-    'santa-claus-conquers-the-martians.jpg',
-    'the-dance-of-life.jpg',
-    'the-great-flamarion.jpg',
-    'the-man-with-the-golden-arm.jpg',
-    'made-for-each-other.png',
-    'popeye-meets-sinbad.png',
-  ];
-
-  const index = getRandomInteger(0, posterNames.length - 1);
-  return directory + posterNames[index];
+  const index = getRandomInteger(0, POSTER_NAMES.length - 1);
+  return POSTER_DIRECTORY + POSTER_NAMES[index];
 };
 
 const generateMovieRating = () => randomFloat();
@@ -144,33 +171,13 @@ const generateCommentDate = () => {
 };
 
 const generateComment = () => {
-  const commentsMock = [
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    'Cras aliquet varius magna, non porta ligula feugiat eget.',
-    'Fusce tristique felis at fermentum pharetra.',
-    'Aliquam id orci ut lectus varius viverra.',
-    'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
-  ];
-
-  const emotions = [
-    'angry',
-    'puke',
-    'sleeping',
-    'smile',
-  ];
-
-  const commentAuthorsMock = [
-    'Tim Macoveev',
-    'John Doe',
-  ];
-
   const commentsAmount = getRandomInteger(MIN_COMMENTS_AMOUNT, MAX_COMMENTS_AMOUNT);
 
   const comments = new Array(commentsAmount).fill(null).map(() => (
     {
-      text: getRandomArrayProperty(commentsMock),
-      emotion: getRandomArrayProperty(emotions),
-      author: getRandomArrayProperty(commentAuthorsMock),
+      text: getRandomArrayProperty(COMMENTS_MOCK),
+      emotion: getRandomArrayProperty(COMMENT_EMOTIONS),
+      author: getRandomArrayProperty(COMMENT_AUTHOR),
       date: generateCommentDate(),
     }
   ));
@@ -180,57 +187,44 @@ const generateComment = () => {
 
 const generateMovieWriters = () => {
   const amount = getRandomInteger(MOVIE_WRITERS_MIN_AMOUNT, MOVIE_WRITERS_MAX_AMOUNT);
-  const writers = [];
-  for (let i = 0; i < amount; i++) {
-    const firstName = firstNames[getRandomInteger(0, firstNames.length - 1)];
-    const lastName = lastNames[getRandomInteger(0, lastNames.length - 1)];
+  const writers = Array.from({length: amount}, () => {
+    const firstName = FIRST_NAMES[getRandomInteger(0, FIRST_NAMES.length - 1)];
+    const lastName = LAST_NAMES[getRandomInteger(0, LAST_NAMES.length - 1)];
     const name = `${firstName} ${lastName}`;
-    writers.push(name);
-  }
-  return writers.join(', ');
+    return name;
+  });
+  return writers;
 };
 
 const generateMovieActors = () => {
   const amount = getRandomInteger(MOVIE_ACTORS_MIN_AMOUNT, MOVIE_ACTORS_MAX_AMOUNT);
-  const actors = [];
-  for (let i = 0; i < amount; i++) {
-    const firstName = firstNames[getRandomInteger(0, firstNames.length - 1)];
-    const lastName = lastNames[getRandomInteger(0, lastNames.length - 1)];
+  const actors = Array.from({length: amount}, () => {
+    const firstName = FIRST_NAMES[getRandomInteger(0, FIRST_NAMES.length - 1)];
+    const lastName = LAST_NAMES[getRandomInteger(0, LAST_NAMES.length - 1)];
     const name = `${firstName} ${lastName}`;
-    actors.push(name);
-  }
-  return actors.join(', ');
+    return name;
+  });
+
+  return actors;
 };
 
 const generateMovieGenres = () => {
   const amount = getRandomInteger(GENRES_DETAILS_AMOUNT);
-  const movieDetailsGenres = [];
-  for (let i = 0; i < amount; i++) {
-    const genre = getRandomArrayProperty(genres);
-    movieDetailsGenres.push(genre);
-  }
+  const movieDetailsGenres = Array.from({length: amount}, () => {
+    const genre = getRandomArrayProperty(GENRES);
+    return genre;
+  });
   return movieDetailsGenres;
 };
 
-const generateMovieDetails = () => {
-  const countries = [
-    'USA',
-    'France',
-    'Germany',
-    'England',
-    'Italy',
-    'India',
-  ];
-
-  return {
-    director: `${getRandomArrayProperty(firstNames)} ${getRandomArrayProperty(lastNames)}`,
-    writers: generateMovieWriters(),
-    actors: generateMovieActors(),
-    releaseDate: generateReleaseDate(),
-    country: getRandomArrayProperty(countries),
-    genres: generateMovieGenres(),
-  };
-};
+const generateMovieDetails = () => ({
+  director: `${getRandomArrayProperty(FIRST_NAMES)} ${getRandomArrayProperty(LAST_NAMES)}`,
+  writers: generateMovieWriters(),
+  actors: generateMovieActors(),
+  releaseDate: generateReleaseDate(),
+  country: getRandomArrayProperty(countries),
+  genres: generateMovieGenres(),
+});
 
 const generateMovie = () => (
   {

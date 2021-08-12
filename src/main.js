@@ -8,7 +8,7 @@ import MovieDetailsView from './view/film-details.js';
 import SortView from './view/sort.js';
 import StatisticsView from './view/statistics.js';
 import EmptyFilmListView from './view/empty-list.js';
-import {render, RenderPosition} from './js/utils.js';
+import {render, RenderPosition, remove} from './js/utils.js';
 
 // ===========================================================
 
@@ -50,8 +50,7 @@ const renderMovieDetails = (movie) => {
 
   function closeMovieDetailsPopup() {
     document.body.classList.remove('hide-overflow');
-    movieDetails.getElement().remove();
-    movieDetails.removeElement();
+    remove(movieDetails);
     document.removeEventListener('keydown', onEscKeyDown);
   }
 
@@ -62,8 +61,11 @@ const renderMovieDetails = (movie) => {
     }
   }
 
-  movieDetails.getElement().querySelector('.film-details__close-btn').addEventListener('click', closeMovieDetailsPopup);
   document.addEventListener('keydown', onEscKeyDown);
+
+  movieDetails.setCloseMovieDetailsPopup(() => {
+    closeMovieDetailsPopup();
+  });
 
   render(footerElement, movieDetails.getElement(), RenderPosition.BEFOREEND);
 };
@@ -72,15 +74,12 @@ const renderMovieDetails = (movie) => {
 const renderMovieCards = (container, movie) => {
   const movieCard = new MovieCardView(movie);
 
-  const showMovieDetailsPopup = (evt) => {
-    evt.preventDefault();
+  movieCard.setMovieCardClick(() => {
     if (document.body.classList.contains('hide-overflow')) {
       return;
     }
     renderMovieDetails(movie);
-  };
-
-  movieCard.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments').forEach((element) => element.addEventListener('click', showMovieDetailsPopup));
+  });
 
   render(container, movieCard.getElement(), RenderPosition.BEFOREEND);
 };
@@ -89,22 +88,22 @@ const renderMovieCards = (container, movie) => {
 
 // Функция отрисовки всего остального
 const renderSite = () => {
-  render(headerElement, new UserProfileView().getElement(), RenderPosition.BEFOREEND);
-  render(mainElement, new MenuTemplateView(moviesMock).getElement(), RenderPosition.AFTERBEGIN);
-  render(mainElement, new SortView().getElement(), RenderPosition.BEFOREEND);
+  render(headerElement, new UserProfileView(), RenderPosition.BEFOREEND);
+  render(mainElement, new MenuTemplateView(moviesMock), RenderPosition.AFTERBEGIN);
+  render(mainElement, new SortView(), RenderPosition.BEFOREEND);
 
   if(moviesMock.length === 0) {
-    render(mainElement, new EmptyFilmListView.getElement(), RenderPosition.BEFOREEND);
+    render(mainElement, new EmptyFilmListView(), RenderPosition.BEFOREEND);
     return;
   }
 
-  render(mainElement, new FilmListView().getElement(), RenderPosition.BEFOREEND);
-  render(footerElement, new StatisticsView().getElement(), RenderPosition.BEFOREEND);
+  render(mainElement, new FilmListView(), RenderPosition.BEFOREEND);
+  render(footerElement, new StatisticsView(), RenderPosition.BEFOREEND);
 
   const filmsListContainer = document.querySelector('.films-list__container');
   const filmsContainer = document.querySelector('.films-list');
 
-  render(filmsContainer, new ShowMoreButtonView().getElement(), RenderPosition.BEFOREEND);
+  render(filmsContainer, new ShowMoreButtonView(), RenderPosition.BEFOREEND);
 
   const showMoreMoviesButton = document.querySelector('.films-list__show-more');
 
@@ -128,7 +127,7 @@ const renderSite = () => {
 
   EXTRA_MOVIES_BLOCKS.forEach((extraBlock) => {
     const extraBlockTemplate = new MovieListExtra(extraBlock);
-    render(filmsElement, extraBlockTemplate.getElement(), RenderPosition.BEFOREEND);
+    render(filmsElement, extraBlockTemplate, RenderPosition.BEFOREEND);
     const insertPlace = extraBlockTemplate.getElement().querySelector('.films-list__container');
     const movies = extraBlock.getMovies();
     movies

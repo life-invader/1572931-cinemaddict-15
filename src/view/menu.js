@@ -1,4 +1,4 @@
-import {createElement} from '../js/utils.js';
+import AbstractView from './abstract.js';
 
 const createMenuTemplate = (movies) => {
   const watchListAmount = movies.filter((movie) => movie.isInWatchList === true);
@@ -16,25 +16,14 @@ const createMenuTemplate = (movies) => {
           </nav>`;
 };
 
-class Menu {
+class Menu extends AbstractView {
   constructor(movies) {
-    this._element = null;
+    super();
     this._movies = movies;
   }
 
   getTemplate() {
     return createMenuTemplate(this._movies);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

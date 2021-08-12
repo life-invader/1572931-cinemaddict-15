@@ -1,39 +1,26 @@
-import {createElement} from '../js/utils.js';
+import AbstractView from './abstract.js';
 
 const createFilmDetailsTemplate = (movie) => {
   const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details} = movie;
 
   const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
 
-  const renderDetailsGenre = (genres) => {
-    let result = '';
-    for (const value of genres) {
-      result += `<span class="film-details__genre">${value}</span>`;
-    }
-    return result;
-  };
+  const renderDetailsGenre = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
 
-  const renderDetailsComment = (commentsList) => {
-    let result = '';
-    for (const value of commentsList) {
-      result +=
-      `<li class="film-details__comment">
-      <span class="film-details__comment-emoji">
-        <img src="./images/emoji/${value.emotion}.png" width="55" height="55" alt="emoji-smile">
-      </span>
-      <div>
-        <p class="film-details__comment-text">${value.text}</p>
-        <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${value.author}</span>
-          <span class="film-details__comment-day">${value.date}</span>
-          <button class="film-details__comment-delete">Delete</button>
-        </p>
-      </div>
-      </li>
-    `;
-    }
-    return result;
-  };
+  const renderDetailsComment = (commentsList) => commentsList.map((comment) =>
+    (`<li class="film-details__comment">
+        <span class="film-details__comment-emoji">
+          <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
+        </span>
+        <div>
+          <p class="film-details__comment-text">${comment.text}</p>
+          <p class="film-details__comment-info">
+            <span class="film-details__comment-author">${comment.author}</span>
+            <span class="film-details__comment-day">${comment.date}</span>
+            <button class="film-details__comment-delete">Delete</button>
+          </p>
+        </div>
+      </li>`)).join('');
 
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
@@ -67,11 +54,11 @@ const createFilmDetailsTemplate = (movie) => {
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Writers</td>
-                        <td class="film-details__cell">${details.writers}</td>
+                        <td class="film-details__cell">${details.writers.join(', ')}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Actors</td>
-                        <td class="film-details__cell">${details.actors}</td>
+                        <td class="film-details__cell">${details.actors.join(', ')}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Release Date</td>
@@ -87,8 +74,7 @@ const createFilmDetailsTemplate = (movie) => {
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Genres</td>
-                        <td class="film-details__cell">
-                          ${renderDetailsGenre(details.genres)}
+                        <td class="film-details__cell">${renderDetailsGenre(details.genres)}</td>
                       </tr>
                     </table>
 
@@ -150,27 +136,27 @@ const createFilmDetailsTemplate = (movie) => {
           </section>`;
 };
 
-class MovieDetails {
+class MovieDetails extends AbstractView {
   constructor(movie) {
-    this._element = null;
+    super();
     this._movie = movie;
+    this._setCloseMovieDetailsPopup = this._setCloseMovieDetailsPopup.bind(this);
   }
 
   getTemplate() {
     return createFilmDetailsTemplate(this._movie);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _setCloseMovieDetailsPopup(evt) {
+    evt.preventDefault();
+    this._callback.setCloseMovieDetailsPopup();
   }
 
-  removeElement() {
-    this._element = null;
+  setCloseMovieDetailsPopup(callback) {
+    this._callback.setCloseMovieDetailsPopup = callback;
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._setCloseMovieDetailsPopup);
   }
+
 }
 
 export default MovieDetails;
-
