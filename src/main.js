@@ -1,142 +1,28 @@
-import MovieListExtra from './view/film-list-extra.js';
-import FilmListView from './view/film-list.js';
 import MenuTemplateView from './view/menu.js';
-import MovieCardView from './view/movie-card.js';
-import ShowMoreButtonView from './view/show-more-button.js';
 import UserProfileView from './view/user-profile.js';
-import MovieDetailsView from './view/film-details.js';
 import SortView from './view/sort.js';
 import StatisticsView from './view/statistics.js';
-import EmptyFilmListView from './view/empty-list.js';
-import {render, RenderPosition, remove} from './js/utils.js';
+import {render, RenderPosition} from './js/utils.js';
+import BoardPresenter from './presenter/board.js';
 
 // ===========================================================
 
 import {generateMovie} from './mock/movie.js';
 // Изначальный массив фильмов
 const moviesMock = new Array(25).fill(null).map(generateMovie);
-// Его копия, с которой работают кнопки сортировки и фильтрации
-const moviesMockCopy = moviesMock.slice();
-
-// ===========================================================
-
-const MOVIE_CARD_COUNT = 5;
-const MOVIE_CARD_COUNT_EXTRA = 2;
-const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
-const EXTRA_MOVIES_BLOCKS = [
-  {
-    name: 'Top rated',
-    getMovies() {
-      return moviesMockCopy.sort((a, b) => b.rating - a.rating);
-    },
-  },
-  {
-    name: 'Most commented',
-    getMovies() {
-      return moviesMockCopy.sort((a, b) => b.comments.length - a.comments.length);
-    },
-  },
-];
 
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');
 
-// ===========================================================
-// Функция рендера поп-ап'а
-const renderMovieDetails = (movie) => {
-  document.body.classList.add('hide-overflow');
-  const movieDetails = new MovieDetailsView(movie);
+const boardPresenter = new BoardPresenter(mainElement);
 
-  function closeMovieDetailsPopup() {
-    document.body.classList.remove('hide-overflow');
-    remove(movieDetails);
-    document.removeEventListener('keydown', onEscKeyDown);
-  }
+render(headerElement, new UserProfileView(), RenderPosition.BEFOREEND); // Профиль юзера
+render(mainElement, new MenuTemplateView(moviesMock), RenderPosition.AFTERBEGIN); // Меню, кнопки избранное и т.п.
+render(mainElement, new SortView(), RenderPosition.BEFOREEND); // Кнопки сортировки
+render(footerElement, new StatisticsView(), RenderPosition.BEFOREEND); // Статистика с кол-вом фильмов
 
-  function onEscKeyDown(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      closeMovieDetailsPopup();
-    }
-  }
-
-  document.addEventListener('keydown', onEscKeyDown);
-
-  movieDetails.setCloseMovieDetailsPopup(() => {
-    closeMovieDetailsPopup();
-  });
-
-  render(footerElement, movieDetails.getElement(), RenderPosition.BEFOREEND);
-};
-
-// Функция рендера карточек фильма
-const renderMovieCards = (container, movie) => {
-  const movieCard = new MovieCardView(movie);
-
-  movieCard.setMovieCardClick(() => {
-    if (document.body.classList.contains('hide-overflow')) {
-      return;
-    }
-    renderMovieDetails(movie);
-  });
-
-  render(container, movieCard.getElement(), RenderPosition.BEFOREEND);
-};
-
-// ===========================================================
-
-// Функция отрисовки всего остального
-const renderSite = () => {
-  render(headerElement, new UserProfileView(), RenderPosition.BEFOREEND);
-  render(mainElement, new MenuTemplateView(moviesMock), RenderPosition.AFTERBEGIN);
-  render(mainElement, new SortView(), RenderPosition.BEFOREEND);
-
-  if(moviesMock.length === 0) {
-    render(mainElement, new EmptyFilmListView(), RenderPosition.BEFOREEND);
-    return;
-  }
-
-  render(mainElement, new FilmListView(), RenderPosition.BEFOREEND);
-  render(footerElement, new StatisticsView(), RenderPosition.BEFOREEND);
-
-  const filmsListContainer = document.querySelector('.films-list__container');
-  const filmsContainer = document.querySelector('.films-list');
-
-  render(filmsContainer, new ShowMoreButtonView(), RenderPosition.BEFOREEND);
-
-  const showMoreMoviesButton = document.querySelector('.films-list__show-more');
-
-  // Отрисовка первых 5 карточек фильмов
-  moviesMockCopy
-    .slice(0, MOVIE_CARD_COUNT)
-    .forEach((movie) => renderMovieCards(filmsListContainer, movie));
-
-  // Показ следующих пяти фильмов
-  showMoreMoviesButton.addEventListener('click', () => {
-    moviesMockCopy
-      .slice(filmsListContainer.children.length, filmsListContainer.children.length + SHOW_MORE_MOVIES_BUTTON_STEP)
-      .forEach((movie) => renderMovieCards(filmsListContainer, movie));
-    if (filmsListContainer.children.length >= moviesMockCopy.length) {
-      showMoreMoviesButton.classList.add('visually-hidden');
-    }
-  });
-
-  // Показ дополнительных блоков 'Top rated' и 'Most commented'
-  const filmsElement = document.querySelector('.films');
-
-  EXTRA_MOVIES_BLOCKS.forEach((extraBlock) => {
-    const extraBlockTemplate = new MovieListExtra(extraBlock);
-    render(filmsElement, extraBlockTemplate, RenderPosition.BEFOREEND);
-    const insertPlace = extraBlockTemplate.getElement().querySelector('.films-list__container');
-    const movies = extraBlock.getMovies();
-    movies
-      .slice(0, MOVIE_CARD_COUNT_EXTRA)
-      .forEach((movie) => renderMovieCards(insertPlace, movie));
-  });
-};
-
-renderSite();
+boardPresenter.init(moviesMock);
 
 /*
 // СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА
