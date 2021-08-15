@@ -3,7 +3,7 @@ import FilmListView from '../view/film-list.js'; // главный контей�
 import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на случай отсутсвия фильмов
 // import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
-import {render, RenderPosition, remove} from '../js/utils.js';
+import {render, RenderPosition, remove, updateItem} from '../js/utils.js';
 import MoviePresenter from './movie.js';
 
 
@@ -29,6 +29,7 @@ class Board {
   constructor(container) {
     this._boardContainer = container;
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
+    this._moviePresenterMap = new Map();
 
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
@@ -36,6 +37,8 @@ class Board {
     this._showMoreButtonComponent = new ShowMoreButtonView();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
+    this._handleMovieUpdate = this._handleMovieUpdate.bind(this);
+    this._handleModechange = this._handleModechange.bind(this);
   }
 
   init(movies) {
@@ -47,16 +50,28 @@ class Board {
     this._renderBoard();
   }
 
+  _handleModechange() {
+    this._moviePresenterMap.forEach((presenter) => presenter.resetView());
+  }
+
   _renderMovieCard(movie) {
     const movieContainer = this._filmListComponent.getElement().querySelector('.films-list__container');
-    const moviePresenter = new MoviePresenter(movieContainer);
+    const moviePresenter = new MoviePresenter(movieContainer, this._handleMovieUpdate, this._handleModechange);
     moviePresenter.init(movie);
+    this._moviePresenterMap.set(movie.id, moviePresenter);
   }
 
   _renderMovieCards(from, to) {
     this._boardMovies
       .slice(from, to)
       .forEach((movie) => this._renderMovieCard(movie));
+  }
+
+  _clearMovieList() {
+    this._moviePresenterMap.forEach((presenter) => presenter.destroy());
+    this._moviePresenterMap.clear();
+    this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
+    remove(this._showMoreButtonComponent);
   }
 
   _renderNoMovies() {
@@ -84,6 +99,11 @@ class Board {
     if(this._boardMovies.length > SHOW_MORE_MOVIES_BUTTON_STEP) {
       this._renderShowMoreButton();
     }
+  }
+
+  _handleMovieUpdate(updateMovie) {
+    this._boardMovies = updateItem(this._boardMovies, updateMovie);
+    this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
   }
 
   _renderBoard() {

@@ -140,7 +140,11 @@ class MovieDetails extends AbstractView {
   constructor(movie) {
     super();
     this._movie = movie;
+
     this._setCloseMovieDetailsPopup = this._setCloseMovieDetailsPopup.bind(this);
+    this._favouriteDetailsButtonClick = this._favouriteDetailsButtonClick.bind(this);
+    this._addToWatchlistDetailsButtonClick = this._addToWatchlistDetailsButtonClick.bind(this);
+    this._markAsWatchedDetailsButtonClick = this._markAsWatchedDetailsButtonClick.bind(this);
   }
 
   getTemplate() {
@@ -155,6 +159,33 @@ class MovieDetails extends AbstractView {
   setCloseMovieDetailsPopup(callback) {
     this._callback.setCloseMovieDetailsPopup = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._setCloseMovieDetailsPopup);
+  }
+
+  _favouriteDetailsButtonClick() {
+    this._callback.favouriteDetailsButtonClick();
+  }
+
+  _addToWatchlistDetailsButtonClick() {
+    this._callback.addToWatchlistDetailsButtonClick();
+  }
+
+  _markAsWatchedDetailsButtonClick() {
+    this._callback.markAsWatchedDetailsButtonClick();
+  }
+
+  setFavouriteDetailsButtonClick(callback) {
+    this._callback.favouriteDetailsButtonClick = callback;
+    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favouriteDetailsButtonClick);
+  }
+
+  setAddToWatchlistDetailsButtonClick(callback) {
+    this._callback.addToWatchlistDetailsButtonClick = callback;
+    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._addToWatchlistDetailsButtonClick);
+  }
+
+  setMarkAsWatchedDetailsButtonClick(callback) {
+    this._callback.markAsWatchedDetailsButtonClick = callback;
+    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._markAsWatchedDetailsButtonClick);
   }
 
 }

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
 import {getRandomInteger, randomFloat} from '../js/utils.js';
+import {nanoid} from 'nanoid';
 dayjs.extend(objectSupport);
 
 const MIN_COMMENTS_AMOUNT = 0;
@@ -228,6 +229,7 @@ const generateMovieDetails = () => ({
 
 const generateMovie = () => (
   {
+    id: nanoid(),
     name: generateMovieName(),
     genre: generateGenre(),
     rating: generateMovieRating(),

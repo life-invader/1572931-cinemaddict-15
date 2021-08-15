@@ -28,21 +28,52 @@ class MovieCard extends AbstractView {
   constructor(movie) {
     super();
     this._movie = movie;
-    this._setMovieCardClick = this._setMovieCardClick.bind(this);
+
+    this._movieCardClick = this._movieCardClick.bind(this);
+    this._favouriteButtonClick = this._favouriteButtonClick.bind(this);
+    this._addToWatchlistButtonClick = this._addToWatchlistButtonClick.bind(this);
+    this._markAsWatchedButtonClick = this._markAsWatchedButtonClick.bind(this);
   }
 
   getTemplate() {
     return createMovieCardTemplate(this._movie);
   }
 
-  _setMovieCardClick(evt) {
+  _movieCardClick(evt) {
     evt.preventDefault();
-    this._callback.setMovieCardClick();
+    this._callback.movieCardClick();
+  }
+
+  _favouriteButtonClick() {
+    this._callback.favouriteButtonClick();
+  }
+
+  _addToWatchlistButtonClick() {
+    this._callback.addToWatchListButtonClick();
+  }
+
+  _markAsWatchedButtonClick() {
+    this._callback.markAsWatchedButtonClick();
   }
 
   setMovieCardClick(callback) {
-    this._callback.setMovieCardClick = callback;
-    this.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments').forEach((element) => element.addEventListener('click', this._setMovieCardClick));
+    this._callback.movieCardClick = callback;
+    this.getElement().querySelectorAll('.film-card__title, .film-card__poster, .film-card__comments').forEach((element) => element.addEventListener('click', this._movieCardClick));
+  }
+
+  setFavouriteButtonClick(callback) {
+    this._callback.favouriteButtonClick = callback;
+    this.getElement().querySelector('.film-card__controls-item--favorite').addEventListener('click', this._favouriteButtonClick);
+  }
+
+  setAddToWatchlistButtonClick(callback) {
+    this._callback.addToWatchListButtonClick = callback;
+    this.getElement().querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this._addToWatchlistButtonClick);
+  }
+
+  setMarkAsWatchedButtonClick(callback) {
+    this._callback.markAsWatchedButtonClick = callback;
+    this.getElement().querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this._markAsWatchedButtonClick);
   }
 }
 

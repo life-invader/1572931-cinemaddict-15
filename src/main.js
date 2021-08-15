@@ -8,7 +8,7 @@ import BoardPresenter from './presenter/board.js';
 // ===========================================================
 
 import {generateMovie} from './mock/movie.js';
-// Изначальный массив фильмов
+
 const moviesMock = new Array(25).fill(null).map(generateMovie);
 
 const headerElement = document.querySelector('.header');
