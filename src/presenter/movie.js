@@ -2,20 +2,14 @@ import MovieCardView from '../view/movie-card.js'; // Карточка филь�
 import MovieDetailsView from '../view/film-details.js'; // Показ подробной информации о фильме
 import {render, RenderPosition, remove, replace} from '../js/utils.js';
 
-// const MODE = {
-//   opened: 'opende',
-//   closed: 'closed',
-// };
-
 class Movie {
   constructor(movieListContainer, updateData, changeMode) {
     this._movieListContainer = movieListContainer;
     this._updateData = updateData;
-    // this._changeMode = changeMode;
+    this._changeMode = changeMode;
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
-    // this._movieDetailsMode = MODE.closed;
 
     this._handleOpenMovieDetails = this._handleOpenMovieDetails.bind(this);
     this._handleCloseMovieDetailsPopup = this._handleCloseMovieDetailsPopup.bind(this);
@@ -68,11 +62,9 @@ class Movie {
     remove(this._movieDetailsComponent);
   }
 
-  // resetView() {
-  //   if(this._movieDetailsMode !== MODE.closed) {
-  //     this._handleCloseMovieDetailsPopup();
-  //   }
-  // }
+  resetView() {
+    this._handleCloseMovieDetailsPopup();
+  }
 
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -82,35 +74,19 @@ class Movie {
   }
 
   _handleCloseMovieDetailsPopup() {
-    // this._movieDetailsMode = MODE.closed;
     document.body.classList.remove('hide-overflow');
-    // remove(this._movieDetailsComponent);
     this._movieDetailsComponent.getElement().remove();
     document.removeEventListener('keydown', this._onEscKeyDown);
   }
 
-  // _closeMovieDetailsPopup() {
-  //   document.body.classList.remove('hide-overflow');
-  //   remove(this._movieDetailsComponent);
-  //   document.removeEventListener('keydown', this._onEscKeyDown);
-  // }
-
   _renderMovieDetails() {
-    // this._movieDetailsMode = MODE.opened;
-    // this._changeMode();
     document.addEventListener('keydown', this._onEscKeyDown);
-
-    // this._movieDetailsComponent.setCloseMovieDetailsPopup(() => {
-    //   this._closeMovieDetailsPopup();
-    // });
-
     render(this._movieDetailsContainer, this._movieDetailsComponent, RenderPosition.BEFOREEND);
   }
 
   _handleOpenMovieDetails() {
-    // if (document.body.classList.contains('hide-overflow')) {
-    //   return;
-    // }
+    this._changeMode();
+
     document.body.classList.add('hide-overflow');
     this._renderMovieDetails();
   }
