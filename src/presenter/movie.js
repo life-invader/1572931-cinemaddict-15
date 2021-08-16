@@ -2,20 +2,20 @@ import MovieCardView from '../view/movie-card.js'; // Карточка филь�
 import MovieDetailsView from '../view/film-details.js'; // Показ подробной информации о фильме
 import {render, RenderPosition, remove, replace} from '../js/utils.js';
 
-const MODE = {
-  opened: 'opende',
-  closed: 'closed',
-};
+// const MODE = {
+//   opened: 'opende',
+//   closed: 'closed',
+// };
 
 class Movie {
   constructor(movieListContainer, updateData, changeMode) {
     this._movieListContainer = movieListContainer;
     this._updateData = updateData;
-    this._changeMode = changeMode;
+    // this._changeMode = changeMode;
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
-    this._movieDetailsMode = MODE.closed;
+    // this._movieDetailsMode = MODE.closed;
 
     this._handleOpenMovieDetails = this._handleOpenMovieDetails.bind(this);
     this._handleCloseMovieDetailsPopup = this._handleCloseMovieDetailsPopup.bind(this);
@@ -51,7 +51,7 @@ class Movie {
       return;
     }
 
-    if(this._movieDetailsMode === MODE.closed) {
+    if (this._movieListContainer.contains(prevMovieComponent.getElement())) {
       replace(this._movieComponent, prevMovieComponent);
     }
 
@@ -59,7 +59,8 @@ class Movie {
       replace(this._movieDetailsComponent, prevMovieDetailsComponent);
     }
 
-    remove(prevMovieComponent);
+    // Зачем это нужно, хз. Взял из демо проекта. И без этой строки все работает
+    // remove(prevMovieComponent);
   }
 
   destroy() {
@@ -67,11 +68,11 @@ class Movie {
     remove(this._movieDetailsComponent);
   }
 
-  resetView() {
-    if(this._movieDetailsMode !== MODE.closed) {
-      this._handleCloseMovieDetailsPopup();
-    }
-  }
+  // resetView() {
+  //   if(this._movieDetailsMode !== MODE.closed) {
+  //     this._handleCloseMovieDetailsPopup();
+  //   }
+  // }
 
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -81,9 +82,10 @@ class Movie {
   }
 
   _handleCloseMovieDetailsPopup() {
-    this._movieDetailsMode = MODE.closed;
+    // this._movieDetailsMode = MODE.closed;
     document.body.classList.remove('hide-overflow');
-    remove(this._movieDetailsComponent);
+    // remove(this._movieDetailsComponent);
+    this._movieDetailsComponent.getElement().remove();
     document.removeEventListener('keydown', this._onEscKeyDown);
   }
 
@@ -94,8 +96,8 @@ class Movie {
   // }
 
   _renderMovieDetails() {
-    this._movieDetailsMode = MODE.opened;
-    this._changeMode();
+    // this._movieDetailsMode = MODE.opened;
+    // this._changeMode();
     document.addEventListener('keydown', this._onEscKeyDown);
 
     // this._movieDetailsComponent.setCloseMovieDetailsPopup(() => {
