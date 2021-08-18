@@ -4,7 +4,7 @@ import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на 
 import SortView from '../view/sort.js';
 // import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
-import {render, RenderPosition, remove, updateItem, sortByDate, sortByrating, SORT_BUTTONS} from '../js/utils.js';
+import {render, RenderPosition, remove, updateItem, replace, sortByDate, sortByrating, SORT_BUTTONS} from '../js/utils.js';
 import MoviePresenter from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
@@ -31,8 +31,8 @@ class Board {
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
     this._currentSort = SORT_BUTTONS.default;
     this._moviePresenterMap = new Map();
+    this._sortComponent = null;
 
-    this._sortComponent = new SortView();
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
     this._emptyFilmListComponent = new EmptyFilmListView();
@@ -47,11 +47,6 @@ class Board {
   init(movies) {
     this._boardMovies = movies.slice();
     this._sourcedBoardMovies = movies.slice();
-
-    // new Sort() перенесен из main.js
-    // render(this._boardContainer, this._sortComponent, RenderPosition.BEFOREEND);
-    // render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
-    // render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
 
     this._renderBoard();
   }
@@ -73,14 +68,26 @@ class Board {
     this._clearMovieList();
 
     // Заменим View-компонент сортировки, чтобы подсветить нажатую кнопку
-    // replace(new Sort(this._currentSort));
+    this._renderSort();
 
     // - Рендерим список заново
     this._renderMovieList();
   }
 
   _renderSort() {
-    render(this._boardContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    const prevSortComponent = this._sortComponent;
+    this._sortComponent = new SortView(this._currentSort);
+
+    if(prevSortComponent !== null) {
+      if (this._boardContainer.contains(prevSortComponent.getElement())) {
+        replace(this._sortComponent, prevSortComponent);
+      }
+    }
+
+    if (prevSortComponent === null) {
+      render(this._boardContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    }
+
     this._sortComponent.setSortTypeChangeHandler(this._handleSortChange);
   }
 
@@ -155,12 +162,8 @@ class Board {
   }
 
   _renderBoard() {
-    // if(this._boardMovies.length === 0) {
-    //   this._renderNoMovies();
-    //   return;
-    // }
-
     this._renderSort();
+
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
 
