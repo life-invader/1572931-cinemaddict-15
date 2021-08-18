@@ -1,11 +1,11 @@
 import BoardView from '../view/board.js'; // Поле с фильмами
 import FilmListView from '../view/film-list.js'; // главный контейнер для карточек фильмов и кнопки
 import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на случай отсутсвия фильмов
+import SortView from '../view/sort.js';
 // import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
-import {render, RenderPosition, remove, updateItem} from '../js/utils.js';
+import {render, RenderPosition, remove, updateItem, sortByDate, sortByrating, SORT_BUTTONS} from '../js/utils.js';
 import MoviePresenter from './movie.js';
-
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
 // const MOVIE_CARD_COUNT_EXTRA = 2;
@@ -29,8 +29,10 @@ class Board {
   constructor(container) {
     this._boardContainer = container;
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
+    this._currentSort = SORT_BUTTONS.default;
     this._moviePresenterMap = new Map();
 
+    this._sortComponent = new SortView();
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
     this._emptyFilmListComponent = new EmptyFilmListView();
@@ -39,13 +41,17 @@ class Board {
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleMovieUpdate = this._handleMovieUpdate.bind(this);
     this._handleModechange = this._handleModechange.bind(this);
+    this._handleSortChange = this._handleSortChange.bind(this);
   }
 
   init(movies) {
     this._boardMovies = movies.slice();
+    this._sourcedBoardMovies = movies.slice();
 
-    render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
-    render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
+    // new Sort() перенесен из main.js
+    // render(this._boardContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    // render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
+    // render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
 
     this._renderBoard();
   }
@@ -53,6 +59,47 @@ class Board {
   _handleModechange() {
     this._moviePresenterMap.forEach((presenter) => presenter.resetView());
   }
+  //============================================================================================================================================
+
+  _handleSortChange(sortType) {
+    // - Сортируем задачи
+    if (this._currentSort === sortType) {
+      return;
+    }
+
+    this._sortMovies(sortType);
+
+    // - Очищаем список
+    this._clearMovieList();
+
+    // Заменим View-компонент сортировки, чтобы подсветить нажатую кнопку
+    // replace(new Sort(this._currentSort));
+
+    // - Рендерим список заново
+    this._renderMovieList();
+  }
+
+  _renderSort() {
+    render(this._boardContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortChange);
+  }
+
+  _sortMovies(sortType) {
+    switch (sortType) {
+      case SORT_BUTTONS.byDate:
+        this._boardMovies.sort(sortByDate);
+        break;
+      case SORT_BUTTONS.byRating:
+        this._boardMovies.sort(sortByrating);
+        break;
+      default:
+        this._boardMovies = this._sourcedBoardMovies.slice();
+    }
+
+    this._currentSort = sortType;
+  }
+
+  //============================================================================================================================================
 
   _renderMovieCard(movie) {
     const movieContainer = this._filmListComponent.getElement().querySelector('.films-list__container');
@@ -103,10 +150,20 @@ class Board {
 
   _handleMovieUpdate(updateMovie) {
     this._boardMovies = updateItem(this._boardMovies, updateMovie);
+    this._sourcedBoardMovies = updateItem(this._sourcedBoardMovies, updateMovie);
     this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
   }
 
   _renderBoard() {
+    // if(this._boardMovies.length === 0) {
+    //   this._renderNoMovies();
+    //   return;
+    // }
+
+    this._renderSort();
+    render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
+    render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
+
     if(this._boardMovies.length === 0) {
       this._renderNoMovies();
       return;

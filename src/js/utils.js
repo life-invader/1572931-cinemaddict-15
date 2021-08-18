@@ -1,4 +1,12 @@
+import dayjs from 'dayjs';
 import Abstract from '../view/abstract.js';
+
+const SORT_BUTTONS = {
+  default: 'default',
+  byDate: 'byDate',
+  byRating: 'byRating',
+};
+
 
 const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
@@ -82,5 +90,9 @@ const replace = (newChild, oldChild) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, updateItem, replace};
+const sortByDate = (firstMovie, secondMovie) => dayjs(secondMovie.details.releaseDate).diff(dayjs(firstMovie.details.releaseDate));
+
+const sortByrating = (firstMovie, secondMovie) => secondMovie.rating - firstMovie.rating;
+
+export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, updateItem, replace, sortByDate, sortByrating, SORT_BUTTONS};
 
