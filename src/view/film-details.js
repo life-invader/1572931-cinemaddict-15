@@ -168,7 +168,8 @@ class MovieDetails extends SmartView {
       return;
     }
 
-    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true});
+    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, scroll: this.getElement().scrollTop});
+    this.getElement().scrollTop = this._movie.scroll;
 
     if(!this._movie.commentMessage) {
       return;
