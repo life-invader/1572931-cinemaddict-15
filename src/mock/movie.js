@@ -244,4 +244,4 @@ const generateMovie = () => (
   }
 );
 
-export {generateMovie};
+export {generateMovie, COMMENT_EMOTIONS};

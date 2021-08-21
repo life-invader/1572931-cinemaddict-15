@@ -1,11 +1,13 @@
 import AbstractView from './abstract.js';
 
 const createFilmDetailsTemplate = (movie) => {
-  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details} = movie;
+  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, isEmoji, newCommentEmoji = null} = movie;
 
   const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
 
   const renderDetailsGenre = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
+
+  // const
 
   const renderDetailsComment = (commentsList) => commentsList.map((comment) =>
     (`<li class="film-details__comment">
@@ -102,7 +104,7 @@ const createFilmDetailsTemplate = (movie) => {
                   </ul>
 
                   <div class="film-details__new-comment">
-                    <div class="film-details__add-emoji-label"></div>
+                    <div class="film-details__add-emoji-label">${isEmoji ? `<img src=${newCommentEmoji} width="55" height="55" alt="emoji-smile">` : ''}</div>
 
                     <label class="film-details__comment-label">
                       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -139,17 +141,61 @@ const createFilmDetailsTemplate = (movie) => {
 class MovieDetails extends AbstractView {
   constructor(movie) {
     super();
-    this._movie = movie;
+    this._movie = MovieDetails.addNewCommentEmoji(movie);
 
     this._setCloseMovieDetailsPopup = this._setCloseMovieDetailsPopup.bind(this);
     this._favouriteDetailsButtonClick = this._favouriteDetailsButtonClick.bind(this);
     this._addToWatchlistDetailsButtonClick = this._addToWatchlistDetailsButtonClick.bind(this);
     this._markAsWatchedDetailsButtonClick = this._markAsWatchedDetailsButtonClick.bind(this);
+    this._toggleCommentEmojiHandler = this._toggleCommentEmojiHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
     return createFilmDetailsTemplate(this._movie);
   }
+
+  // ==================================================================================================================================================================================
+
+  updateData(update) {
+    if(!update) {
+      return;
+    }
+
+    this._movie = Object.assign({}, this._movie, update);
+    this.updateElement();
+  }
+
+  updateElement() {
+    const prevElement = this.getElement();
+    const parent = prevElement.parentElement;
+    this.removeElement();
+
+    const newElement = this.getElement();
+
+    parent.replaceChild(newElement, prevElement);
+    this.restoreHandlers();
+  }
+
+  _toggleCommentEmojiHandler(evt) {
+    if(this._movie.newCommentEmoji === evt.target.src) {
+      return;
+    }
+
+    this.updateData({newCommentEmoji: evt.target.src, isEmoji: true});
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseMovieDetailsPopup(this._callback.setCloseMovieDetailsPopup);
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelectorAll('.film-details__emoji-label').forEach((emoji) => emoji.addEventListener('click', this._toggleCommentEmojiHandler));
+  }
+
+  // ==================================================================================================================================================================================
 
   _setCloseMovieDetailsPopup(evt) {
     evt.preventDefault();
@@ -186,6 +232,17 @@ class MovieDetails extends AbstractView {
   setMarkAsWatchedDetailsButtonClick(callback) {
     this._callback.markAsWatchedDetailsButtonClick = callback;
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._markAsWatchedDetailsButtonClick);
+  }
+
+  static addNewCommentEmoji(data) {
+    return Object.assign(
+      {},
+      data,
+      {
+        isEmoji: false,
+        newCommentEmoji: null,
+      },
+    );
   }
 
 }
