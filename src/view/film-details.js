@@ -1,4 +1,4 @@
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
 
 const createFilmDetailsTemplate = (movie) => {
   const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, isEmoji, newCommentEmoji = null} = movie;
@@ -138,7 +138,7 @@ const createFilmDetailsTemplate = (movie) => {
           </section>`;
 };
 
-class MovieDetails extends AbstractView {
+class MovieDetails extends SmartView {
   constructor(movie) {
     super();
     this._movie = MovieDetails.addNewCommentEmoji(movie);
@@ -148,6 +148,7 @@ class MovieDetails extends AbstractView {
     this._addToWatchlistDetailsButtonClick = this._addToWatchlistDetailsButtonClick.bind(this);
     this._markAsWatchedDetailsButtonClick = this._markAsWatchedDetailsButtonClick.bind(this);
     this._toggleCommentEmojiHandler = this._toggleCommentEmojiHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -158,41 +159,35 @@ class MovieDetails extends AbstractView {
 
   // ==================================================================================================================================================================================
 
-  updateData(update) {
-    if(!update) {
-      return;
-    }
-
-    this._movie = Object.assign({}, this._movie, update);
-    this.updateElement();
-  }
-
-  updateElement() {
-    const prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-
-    const newElement = this.getElement();
-
-    parent.replaceChild(newElement, prevElement);
-    this.restoreHandlers();
-  }
-
   _toggleCommentEmojiHandler(evt) {
     if(this._movie.newCommentEmoji === evt.target.src) {
       return;
     }
 
     this.updateData({newCommentEmoji: evt.target.src, isEmoji: true});
+
+    if(!this._movie.commentMessage) {
+      return;
+    }
+
+    this.getElement().querySelector('.film-details__comment-input').value = this._movie.commentMessage;
+  }
+
+  _commentInputHandler(evt) {
+    this.updateData({commentMessage: evt.target.value}, true);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setCloseMovieDetailsPopup(this._callback.setCloseMovieDetailsPopup);
+    this.setFavouriteDetailsButtonClick(this._callback.favouriteDetailsButtonClick);
+    this.setAddToWatchlistDetailsButtonClick(this._callback.addToWatchlistDetailsButtonClick);
+    this.setMarkAsWatchedDetailsButtonClick(this._callback.markAsWatchedDetailsButtonClick);
   }
 
   _setInnerHandlers() {
     this.getElement().querySelectorAll('.film-details__emoji-label').forEach((emoji) => emoji.addEventListener('click', this._toggleCommentEmojiHandler));
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
   }
 
   // ==================================================================================================================================================================================

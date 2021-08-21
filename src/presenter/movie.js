@@ -68,7 +68,7 @@ class Movie {
 
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
+      // evt.preventDefault();
       this._handleCloseMovieDetailsPopup();
     }
   }
