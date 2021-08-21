@@ -69,6 +69,7 @@ class Movie {
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       // evt.preventDefault();
+      this._movieDetailsComponent.reset(this._movie);
       this._handleCloseMovieDetailsPopup();
     }
   }

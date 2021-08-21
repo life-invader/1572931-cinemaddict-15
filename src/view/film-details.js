@@ -1,7 +1,7 @@
 import SmartView from './smart.js';
 
 const createFilmDetailsTemplate = (movie) => {
-  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, isEmoji, newCommentEmoji = null} = movie;
+  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, isEmoji, newCommentEmojiPath = null} = movie;
 
   const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
 
@@ -104,7 +104,7 @@ const createFilmDetailsTemplate = (movie) => {
                   </ul>
 
                   <div class="film-details__new-comment">
-                    <div class="film-details__add-emoji-label">${isEmoji ? `<img src=${newCommentEmoji} width="55" height="55" alt="emoji-smile">` : ''}</div>
+                    <div class="film-details__add-emoji-label">${isEmoji ? `<img src=${newCommentEmojiPath} width="55" height="55" alt="emoji-smile">` : ''}</div>
 
                     <label class="film-details__comment-label">
                       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -159,12 +159,16 @@ class MovieDetails extends SmartView {
 
   // ==================================================================================================================================================================================
 
+  reset(movie) {
+    this.updateData(MovieDetails.restoreChanges(movie));
+  }
+
   _toggleCommentEmojiHandler(evt) {
-    if(this._movie.newCommentEmoji === evt.target.src) {
+    if(this._movie.newCommentEmojiPath === evt.target.src) {
       return;
     }
 
-    this.updateData({newCommentEmoji: evt.target.src, isEmoji: true});
+    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true});
 
     if(!this._movie.commentMessage) {
       return;
@@ -229,13 +233,17 @@ class MovieDetails extends SmartView {
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._markAsWatchedDetailsButtonClick);
   }
 
+  static restoreChanges(data) {
+    return Object.assign({}, data, {newCommentEmojiPath: null, isEmoji: false, commentMessage: null});
+  }
+
   static addNewCommentEmoji(data) {
     return Object.assign(
       {},
       data,
       {
         isEmoji: false,
-        newCommentEmoji: null,
+        newCommentEmojiPath: null,
       },
     );
   }
