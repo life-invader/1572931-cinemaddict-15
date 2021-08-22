@@ -68,7 +68,10 @@ class Movie {
 
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
-      // evt.preventDefault();
+      if (evt.target.tagName === 'INPUT' || evt.target.tagName === 'TEXTAREA') {
+        evt.stopPropagation();
+        return;
+      }
       this._movieDetailsComponent.reset(this._movie);
       this._handleCloseMovieDetailsPopup();
     }
