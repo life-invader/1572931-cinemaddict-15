@@ -26,8 +26,9 @@ const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
 // ];
 
 class Board {
-  constructor(container) {
+  constructor(container, movieModel) {
     this._boardContainer = container;
+    this._movieModel = movieModel;
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
     this._currentSort = SORT_BUTTONS.default;
     this._moviePresenterMap = new Map();
@@ -51,10 +52,13 @@ class Board {
     this._renderBoard();
   }
 
+  _getMovies() {
+    return this._movieModel.getMovies();
+  }
+
   _handleModechange() {
     this._moviePresenterMap.forEach((presenter) => presenter.resetView());
   }
-  //============================================================================================================================================
 
   _handleSortChange(sortType) {
     // - Сортируем задачи
@@ -105,8 +109,6 @@ class Board {
 
     this._currentSort = sortType;
   }
-
-  //============================================================================================================================================
 
   _renderMovieCard(movie) {
     const movieContainer = this._filmListComponent.getElement().querySelector('.films-list__container');
