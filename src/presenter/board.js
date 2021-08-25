@@ -49,6 +49,8 @@ class Board {
     this._renderBoard();
   }
 
+
+
   _getMovies() {
     switch (this._currentSort) {
       case SORT_BUTTONS.byDate:
