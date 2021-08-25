@@ -4,7 +4,7 @@ import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на 
 import SortView from '../view/sort.js';
 // import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
-import {render, RenderPosition, remove, updateItem, replace, sortByDate, sortByrating, SORT_BUTTONS} from '../js/utils.js';
+import {render, RenderPosition, remove, replace, sortByDate, sortByrating, SORT_BUTTONS} from '../js/utils.js';
 import MoviePresenter from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
@@ -45,14 +45,17 @@ class Board {
     this._handleSortChange = this._handleSortChange.bind(this);
   }
 
-  init(movies) {
-    this._boardMovies = movies.slice();
-    this._sourcedBoardMovies = movies.slice();
-
+  init() {
     this._renderBoard();
   }
 
   _getMovies() {
+    switch (this._currentSort) {
+      case SORT_BUTTONS.byDate:
+        return this._movieModel.getMovies().slice().sort(sortByDate);
+      case SORT_BUTTONS.byRating:
+        return this._movieModel.getMovies().slice().sort(sortByrating);
+    }
     return this._movieModel.getMovies();
   }
 
@@ -66,7 +69,7 @@ class Board {
       return;
     }
 
-    this._sortMovies(sortType);
+    this._currentSort = sortType;
 
     // - Очищаем список
     this._clearMovieList();
@@ -95,21 +98,6 @@ class Board {
     this._sortComponent.setSortTypeChangeHandler(this._handleSortChange);
   }
 
-  _sortMovies(sortType) {
-    switch (sortType) {
-      case SORT_BUTTONS.byDate:
-        this._boardMovies.sort(sortByDate);
-        break;
-      case SORT_BUTTONS.byRating:
-        this._boardMovies.sort(sortByrating);
-        break;
-      default:
-        this._boardMovies = this._sourcedBoardMovies.slice();
-    }
-
-    this._currentSort = sortType;
-  }
-
   _renderMovieCard(movie) {
     const movieContainer = this._filmListComponent.getElement().querySelector('.films-list__container');
     const moviePresenter = new MoviePresenter(movieContainer, this._handleMovieUpdate, this._handleModechange);
@@ -117,10 +105,8 @@ class Board {
     this._moviePresenterMap.set(movie.id, moviePresenter);
   }
 
-  _renderMovieCards(from, to) {
-    this._boardMovies
-      .slice(from, to)
-      .forEach((movie) => this._renderMovieCard(movie));
+  _renderMovieCards(movies) {
+    movies.forEach((movie) => this._renderMovieCard(movie));
   }
 
   _clearMovieList() {
@@ -135,10 +121,14 @@ class Board {
   }
 
   _handleShowMoreButtonClick() {
-    this._renderMovieCards(this._renderedMoviesCount, this._renderedMoviesCount + SHOW_MORE_MOVIES_BUTTON_STEP);
-    this._renderedMoviesCount += SHOW_MORE_MOVIES_BUTTON_STEP;
+    const movieCount = this._getMovies().length;
+    const newRenderMovieCount = Math.min(movieCount, this._renderedMoviesCount + SHOW_MORE_MOVIES_BUTTON_STEP);
+    const movies = this._getMovies().slice(this._renderedMoviesCount, newRenderMovieCount);
 
-    if (this._renderedMoviesCount >= this._boardMovies.length) {
+    this._renderMovieCards(movies);
+    this._renderedMoviesCount = newRenderMovieCount;
+
+    if (this._renderedMoviesCount >= movieCount) {
       remove(this._showMoreButtonComponent);
     }
   }
@@ -150,16 +140,17 @@ class Board {
   }
 
   _renderMovieList() {
-    this._renderMovieCards(0, SHOW_MORE_MOVIES_BUTTON_STEP);
+    const movieCount = this._getMovies().length;
+    const movies = this._getMovies().slice(0, Math.min(movieCount, SHOW_MORE_MOVIES_BUTTON_STEP));
 
-    if(this._boardMovies.length > SHOW_MORE_MOVIES_BUTTON_STEP) {
+    this._renderMovieCards(movies);
+
+    if(movieCount > SHOW_MORE_MOVIES_BUTTON_STEP) {
       this._renderShowMoreButton();
     }
   }
 
   _handleMovieUpdate(updateMovie) {
-    this._boardMovies = updateItem(this._boardMovies, updateMovie);
-    this._sourcedBoardMovies = updateItem(this._sourcedBoardMovies, updateMovie);
     this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
   }
 
@@ -169,7 +160,7 @@ class Board {
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
 
-    if(this._boardMovies.length === 0) {
+    if(this._getMovies().length === 0) {
       this._renderNoMovies();
       return;
     }

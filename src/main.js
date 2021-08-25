@@ -21,7 +21,7 @@ render(headerElement, new UserProfileView(), RenderPosition.BEFOREEND); // Пр�
 render(mainElement, new MenuTemplateView(moviesMock), RenderPosition.AFTERBEGIN); // Меню, кнопки избранное и т.п.
 render(footerElement, new StatisticsView(), RenderPosition.BEFOREEND); // Статистика с кол-вом фильмов
 
-boardPresenter.init(moviesMock);
+boardPresenter.init();
 
 /*
 // СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА СОРТИРОВКА

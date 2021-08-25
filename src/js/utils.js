@@ -1,12 +1,15 @@
 import dayjs from 'dayjs';
 import Abstract from '../view/abstract.js';
 
+// const USER_ACTION = {
+
+// }
+
 const SORT_BUTTONS = {
   default: 'default',
   byDate: 'byDate',
   byRating: 'byRating',
 };
-
 
 const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
