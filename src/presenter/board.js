@@ -36,11 +36,12 @@ class Board {
 
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
-    this._emptyFilmListComponent = new EmptyFilmListView();
+    // this._emptyFilmListComponent = new EmptyFilmListView();
 
     // this._showMoreButtonComponent = new ShowMoreButtonView();
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
+    this._noMoviesComponent = new EmptyFilmListView();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -143,7 +144,8 @@ class Board {
   }
 
   _renderNoMovies() {
-    render(this._boardComponent, this._emptyFilmListComponent, RenderPosition.BEFOREEND);
+    this._noMoviesComponent = new EmptyFilmListView();
+    render(this._boardComponent, this._noMoviesComponent, RenderPosition.BEFOREEND);
   }
 
   _handleShowMoreButtonClick() {
@@ -227,6 +229,10 @@ class Board {
 
     remove(this._sortComponent);
     remove(this._showMoreButtonComponent);
+
+    if(this._noMoviesComponent) {
+      remove(this._noMoviesComponent);
+    }
 
     if(resetRenderedTaskCount) {
       this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
