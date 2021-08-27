@@ -170,6 +170,8 @@ class MovieDetails extends SmartView {
 
     this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, scroll: this.getElement().scrollTop});
     this.getElement().scrollTop = this._movie.scroll;
+    const id = `#${evt.currentTarget.getAttribute('for')}`;
+    this.getElement().querySelector(id).setAttribute('checked','checked');
 
     if(!this._movie.commentMessage) {
       return;

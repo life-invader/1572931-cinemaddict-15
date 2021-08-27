@@ -1,9 +1,31 @@
 import dayjs from 'dayjs';
 import Abstract from '../view/abstract.js';
 
-// const USER_ACTION = {
+const USER_ACTION = {
+  UPDATE_MOVIE: 'UPDATE_TASK',
+  ADD_MOVIE: 'ADD_TASK',
+  DELETE_MOVIE: 'DELETE_TASK',
+};
 
-// }
+const UPDATE_TYPE = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const FILTER_TYPE = {
+  all: 'all',
+  watchlist: 'watchlist',
+  history: 'history',
+  favourites: 'favourites',
+};
+
+const filter = {
+  [FILTER_TYPE.all]: (movies) => movies.slice(),
+  [FILTER_TYPE.watchlist]: (movies) => movies.filter((movie) => movie.isInWatchList === true),
+  [FILTER_TYPE.history]: (movies) => movies.filter((movie) => movie.isWatched === true),
+  [FILTER_TYPE.favourites]: (movies) => movies.filter((movie) => movie.isFavourite === true),
+};
 
 const SORT_BUTTONS = {
   default: 'default',
@@ -43,6 +65,10 @@ const createElement = (template) => {
 };
 
 const remove = (component) => {
+  if (component === null) {
+    return;
+  }
+
   if (!(component instanceof Abstract)) {
     throw new Error('Can remove only components');
   }
@@ -50,7 +76,6 @@ const remove = (component) => {
   component.removeElement();
 };
 
-// Генерация чисел
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -65,15 +90,15 @@ const randomFloat = (a = 10, b = 1) => {
   return String(number).endsWith('0') ? Number(number).toFixed() : Number(number).toFixed(1);
 };
 
-const updateItem = (items, newitem) => {
-  const index = items.findIndex((item) => item.id === newitem.id);
+// const updateItem = (items, newitem) => {
+//   const index = items.findIndex((item) => item.id === newitem.id);
 
-  if(index === -1) {
-    return items;
-  }
+//   if(index === -1) {
+//     return items;
+//   }
 
-  return [...items.slice(0, index), newitem, ...items.slice(index + 1)];
-};
+//   return [...items.slice(0, index), newitem, ...items.slice(index + 1)];
+// };
 
 const replace = (newChild, oldChild) => {
   if (oldChild instanceof Abstract) {
@@ -97,5 +122,5 @@ const sortByDate = (firstMovie, secondMovie) => dayjs(secondMovie.details.releas
 
 const sortByrating = (firstMovie, secondMovie) => secondMovie.rating - firstMovie.rating;
 
-export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, updateItem, replace, sortByDate, sortByrating, SORT_BUTTONS};
+export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, replace, sortByDate, sortByrating, SORT_BUTTONS, USER_ACTION, UPDATE_TYPE, FILTER_TYPE, filter};
 

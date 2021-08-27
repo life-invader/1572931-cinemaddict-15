@@ -6,6 +6,7 @@ import BoardPresenter from './presenter/board.js';
 import MenuFilterPresenter from './presenter/menu.js';
 import {generateMovie} from './mock/movie.js';
 import MovieModel from './model/movie.js';
+import MenuFilterModel from './model/menu-filter.js';
 
 const moviesMock = new Array(25).fill(null).map(generateMovie);
 
@@ -13,10 +14,11 @@ const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
 const footerElement = document.querySelector('.footer');
 
+const menuFilterModel = new MenuFilterModel();
 const movieModel = new MovieModel();
 movieModel.setMovies(moviesMock);
-const boardPresenter = new BoardPresenter(mainElement, movieModel);
-const menuFilterPresenter = new MenuFilterPresenter(mainElement, movieModel);
+const boardPresenter = new BoardPresenter(mainElement, movieModel, menuFilterModel);
+const menuFilterPresenter = new MenuFilterPresenter(mainElement, movieModel, menuFilterModel);
 
 
 render(headerElement, new UserProfileView(), RenderPosition.BEFOREEND); // Профиль юзера

@@ -14,7 +14,8 @@ class Movies extends AbstractObserver {
     return this._movies;
   }
 
-  updateMovie(updateMovie) {
+  updateMovie(updateType, updateMovie) {
+    console.log(updateType)
     const index = this._movies.findIndex((item) => item.id === updateMovie.id);
 
     if(index === -1) {
@@ -23,9 +24,32 @@ class Movies extends AbstractObserver {
 
     this._movies = [...this._movies.slice(0, index), updateMovie, ...this._movies.slice(index + 1)];
 
-    this._notify(updateMovie);
+    this._notify(updateType, updateMovie);
   }
 
+  // addMovie(updateType, updateMovie) {
+  //   this._movies = [
+  //     updateMovie,
+  //     ...this._movies,
+  //   ];
+
+  //   this._notify(updateType, updateMovie);
+  // }
+
+  // deleteMovie(updateType, updateMovie) {
+  //   const index = this._movies.findIndex((item) => item.id === updateMovie.id);
+
+  //   if (index === -1) {
+  //     throw new Error('Can\'t delete unexisting task');
+  //   }
+
+  //   this._movies = [
+  //     ...this._movies.slice(0, index),
+  //     ...this._movies.slice(index + 1),
+  //   ];
+
+  //   this._notify(updateType);
+  // }
 }
 
 export default Movies;
