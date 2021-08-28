@@ -27,14 +27,14 @@ class Movies extends AbstractObserver {
     this._notify(updateType, updateMovie);
   }
 
-  // addComment(updateType, updateMovie) {
-  //   this._movies = [
-  //     updateMovie,
-  //     ...this._movies,
-  //   ];
+  addComment(updateType, updateMovie) {
 
-  //   this._notify(updateType, updateMovie);
-  // }
+    console.log('Adding...');
+    const index = this._movies.findIndex((item) => item.id === updateMovie.id);
+    this._movies = [...this._movies.slice(0, index), updateMovie, ...this._movies.slice(index + 1)];
+
+    this._notify(updateType, updateMovie);
+  }
 
   deleteComment(updateType, updateMovie) {
     const index = this._movies.findIndex((item) => item.id === updateMovie.id);

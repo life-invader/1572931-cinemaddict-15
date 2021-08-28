@@ -2,6 +2,9 @@ import MovieCardView from '../view/movie-card.js'; // Карточка филь�
 import MovieDetailsView from '../view/film-details.js'; // Показ подробной информации о фильме
 import {render, RenderPosition, remove, replace, USER_ACTION, UPDATE_TYPE} from '../js/utils.js';
 
+import {nanoid} from 'nanoid';
+import {getRandomArrayProperty, COMMENT_AUTHOR, generateCommentDate} from '../mock/movie.js';
+
 class Movie {
   constructor(movieListContainer, updateData, changeMode) {
     this._movieListContainer = movieListContainer;
@@ -18,6 +21,7 @@ class Movie {
     this._handleAddToWatchlistButtonClick = this._handleAddToWatchlistButtonClick.bind(this);
     this._handleMarkAsWatchedButtonClick = this._handleMarkAsWatchedButtonClick.bind(this);
     this._handleCommentDeleteClick = this._handleCommentDeleteClick.bind(this);
+    this._handleAddNewComment = this._handleAddNewComment.bind(this);
   }
 
   init(movie) {
@@ -41,6 +45,7 @@ class Movie {
     this._movieDetailsComponent.setAddToWatchlistDetailsButtonClick(this._handleAddToWatchlistButtonClick);
     this._movieDetailsComponent.setMarkAsWatchedDetailsButtonClick(this._handleMarkAsWatchedButtonClick);
     this._movieDetailsComponent.setDeleteCommentClickHandler(this._handleCommentDeleteClick);
+    this._movieDetailsComponent.setAddNewCommentHandler(this._handleAddNewComment);
 
     if (prevMovieComponent === null || prevMovieDetailsComponent === null) {
       render(this._movieListContainer, this._movieComponent, RenderPosition.BEFOREEND);
@@ -121,6 +126,21 @@ class Movie {
 
 
     this._updateData(USER_ACTION.DELETE_COMMENT, this._movie, UPDATE_TYPE.PATCH);
+  }
+
+  _handleAddNewComment(text, emotion) {
+    const obj = {
+      id: nanoid(),
+      text: text,
+      emotion: emotion,
+      author: getRandomArrayProperty(COMMENT_AUTHOR),
+      date: generateCommentDate(),
+    };
+
+    this._movie.comments.push(obj);
+
+    console.log(obj);
+    this._updateData(USER_ACTION.ADD_COMMENT, this._movie, UPDATE_TYPE.PATCH);
   }
 
 //====================================================================================================================

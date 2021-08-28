@@ -151,6 +151,7 @@ class MovieDetails extends SmartView {
     this._toggleCommentEmojiHandler = this._toggleCommentEmojiHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
     this._commentDeleteClickHandler = this._commentDeleteClickHandler.bind(this);
+    this._addNewCommentHandler = this._addNewCommentHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -168,9 +169,11 @@ class MovieDetails extends SmartView {
       return;
     }
 
-    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, scroll: this.getElement().scrollTop});
-    this.getElement().scrollTop = this._movie.scroll;
     const id = `#${evt.currentTarget.getAttribute('for')}`;
+    const emoji = this.getElement().querySelector(id).value;
+
+    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, emoji: emoji, scroll: this.getElement().scrollTop});
+    this.getElement().scrollTop = this._movie.scroll;
     this.getElement().querySelector(id).setAttribute('checked','checked');
 
     if(!this._movie.commentMessage) {
@@ -195,6 +198,10 @@ class MovieDetails extends SmartView {
   _setInnerHandlers() {
     this.getElement().querySelectorAll('.film-details__emoji-label').forEach((emoji) => emoji.addEventListener('click', this._toggleCommentEmojiHandler));
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
+    if(this._movie.comments.length > 0) {
+      this.getElement().querySelectorAll('.film-details__comment').forEach((element) => element.addEventListener('click', this._commentDeleteClickHandler));
+    }
+    this.getElement().querySelector('.film-details__new-comment').addEventListener('keydown', this._addNewCommentHandler);
   }
 
   _setCloseMovieDetailsPopup(evt) {
@@ -250,6 +257,19 @@ class MovieDetails extends SmartView {
     if(this._movie.comments.length > 0) {
       this.getElement().querySelectorAll('.film-details__comment').forEach((element) => element.addEventListener('click', this._commentDeleteClickHandler));
     }
+  }
+
+  _addNewCommentHandler(evt) {
+    if(evt.key !== 'Enter') {
+      return;
+    }
+
+    this._callback.addNewComment(this._movie.commentMessage, this._movie.emoji);
+  }
+
+  setAddNewCommentHandler(callback) {
+    this._callback.addNewComment = callback;
+    this.getElement().querySelector('.film-details__new-comment').addEventListener('keydown', this._addNewCommentHandler);
   }
 
   // ==================================================================================================================================================================================
