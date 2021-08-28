@@ -58,9 +58,10 @@ class Board {
   }
 
   _getMovies() {
-    const filterType = this._filterModel.getFilter();
+    // const filterType = this._filterModel.getFilter();
+    this._filterType = this._filterModel.getFilter();
     const movies = this._movieModel.getMovies();
-    const filteredMovies = filter[filterType](movies);
+    const filteredMovies = filter[this._filterType](movies);
 
     switch (this._currentSort) {
       case SORT_BUTTONS.byDate:
@@ -144,7 +145,7 @@ class Board {
   }
 
   _renderNoMovies() {
-    this._noMoviesComponent = new EmptyFilmListView();
+    this._noMoviesComponent = new EmptyFilmListView(this._filterType);
     render(this._boardComponent, this._noMoviesComponent, RenderPosition.BEFOREEND);
   }
 

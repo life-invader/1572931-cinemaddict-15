@@ -1,4 +1,5 @@
 import SmartView from './smart.js';
+import he from 'he';
 import { USER_ACTION } from '../js/utils.js';
 
 const createFilmDetailsTemplate = (movie) => {

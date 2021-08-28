@@ -15,7 +15,7 @@ class Movies extends AbstractObserver {
   }
 
   updateMovie(updateType, updateMovie) {
-    console.log(updateType)
+    console.log(updateType);
     const index = this._movies.findIndex((item) => item.id === updateMovie.id);
 
     if(index === -1) {
