@@ -6,7 +6,7 @@ const _noMoviesComponentText = {
   [FILTER_TYPE.watchlist]: 'There are no movies to watch now',
   [FILTER_TYPE.history]: 'There are no watched movies now',
   [FILTER_TYPE.favourites]: 'There are no favorite movies now',
-}
+};
 
 const createEmptyFilmListTemplate = (filter) => {
   const noMoviesText = _noMoviesComponentText[filter];

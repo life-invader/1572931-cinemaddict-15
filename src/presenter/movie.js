@@ -120,10 +120,7 @@ class Movie {
   //====================================================================================================================
   _handleCommentDeleteClick(commentId) {
     const index = this._movie.comments.findIndex((comment) => comment.id === commentId);
-    const commentObj = this._movie.comments.find((comment) => comment.id === commentId);
     this._movie.comments = [...this._movie.comments.slice(0, index), ...this._movie.comments.slice(index + 1)];
-    console.log(this._movie.comments);
-
 
     this._updateData(USER_ACTION.DELETE_COMMENT, this._movie, UPDATE_TYPE.PATCH);
   }
@@ -138,8 +135,6 @@ class Movie {
     };
 
     this._movie.comments.push(obj);
-
-    console.log(obj);
     this._updateData(USER_ACTION.ADD_COMMENT, this._movie, UPDATE_TYPE.PATCH);
   }
 

@@ -261,11 +261,16 @@ class MovieDetails extends SmartView {
   }
 
   _addNewCommentHandler(evt) {
-    if(evt.key !== 'Enter') {
-      return;
+    if(evt.key === 'Enter' && evt.ctrlKey) {
+      if(this._movie.emoji) {
+        this._callback.addNewComment(he.encode(this._movie.commentMessage), this._movie.emoji);
+      } else {
+        const commentInput =  this.getElement().querySelector('.film-details__comment-input');
+        commentInput.setCustomValidity('Выберите эмоцию!');
+        commentInput.reportValidity();
+      }
     }
 
-    this._callback.addNewComment(this._movie.commentMessage, this._movie.emoji);
   }
 
   setAddNewCommentHandler(callback) {

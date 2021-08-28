@@ -4,26 +4,11 @@ import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на 
 import SortView from '../view/sort.js';
 // import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
-import {render, RenderPosition, remove, replace, sortByDate, sortByrating, SORT_BUTTONS, UPDATE_TYPE, USER_ACTION, filter} from '../js/utils.js';
+import {render, RenderPosition, remove, sortByDate, sortByrating, SORT_BUTTONS, UPDATE_TYPE, USER_ACTION, filter} from '../js/utils.js';
 import MoviePresenter from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
 // const MOVIE_CARD_COUNT_EXTRA = 2;
-
-// const EXTRA_MOVIES_BLOCKS = [
-//   {
-//     name: 'Top rated',
-//     getMovies() {
-//       return moviesMockCopy.sort((a, b) => b.rating - a.rating);
-//     },
-//   },
-//   {
-//     name: 'Most commented',
-//     getMovies() {
-//       return moviesMockCopy.sort((a, b) => b.comments.length - a.comments.length);
-//     },
-//   },
-// ];
 
 class Board {
   constructor(container, movieModel, filterModel) {
@@ -36,9 +21,7 @@ class Board {
 
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
-    // this._emptyFilmListComponent = new EmptyFilmListView();
 
-    // this._showMoreButtonComponent = new ShowMoreButtonView();
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
     this._noMoviesComponent = new EmptyFilmListView();
@@ -58,17 +41,14 @@ class Board {
   }
 
   _getMovies() {
-    // const filterType = this._filterModel.getFilter();
     this._filterType = this._filterModel.getFilter();
     const movies = this._movieModel.getMovies();
     const filteredMovies = filter[this._filterType](movies);
 
     switch (this._currentSort) {
       case SORT_BUTTONS.byDate:
-        // return this._movieModel.getMovies().slice().sort(sortByDate);
         return filteredMovies.sort(sortByDate);
       case SORT_BUTTONS.byRating:
-        // return this._movieModel.getMovies().slice().sort(sortByrating);
         return filteredMovies.sort(sortByrating);
     }
     return filteredMovies;
@@ -264,8 +244,6 @@ class Board {
     if(moviesCount > this._renderedMoviesCount) {
       this._renderShowMoreButton();
     }
-
-    // this._renderMovieList();
   }
 }
 
