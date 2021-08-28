@@ -17,6 +17,7 @@ class Movie {
     this._handleFavouriteButtonClick = this._handleFavouriteButtonClick.bind(this);
     this._handleAddToWatchlistButtonClick = this._handleAddToWatchlistButtonClick.bind(this);
     this._handleMarkAsWatchedButtonClick = this._handleMarkAsWatchedButtonClick.bind(this);
+    this._handleCommentDeleteClick = this._handleCommentDeleteClick.bind(this);
   }
 
   init(movie) {
@@ -39,6 +40,7 @@ class Movie {
     this._movieDetailsComponent.setFavouriteDetailsButtonClick(this._handleFavouriteButtonClick);
     this._movieDetailsComponent.setAddToWatchlistDetailsButtonClick(this._handleAddToWatchlistButtonClick);
     this._movieDetailsComponent.setMarkAsWatchedDetailsButtonClick(this._handleMarkAsWatchedButtonClick);
+    this._movieDetailsComponent.setDeleteCommentClickHandler(this._handleCommentDeleteClick);
 
     if (prevMovieComponent === null || prevMovieDetailsComponent === null) {
       render(this._movieListContainer, this._movieComponent, RenderPosition.BEFOREEND);
@@ -109,6 +111,19 @@ class Movie {
     // this._updateData(Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}));
     this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}), UPDATE_TYPE.PATCH);
   }
+
+  //====================================================================================================================
+  _handleCommentDeleteClick(commentId) {
+    const index = this._movie.comments.findIndex((comment) => comment.id === commentId);
+    const commentObj = this._movie.comments.find((comment) => comment.id === commentId);
+    this._movie.comments = [...this._movie.comments.slice(0, index), ...this._movie.comments.slice(index + 1)];
+    console.log(this._movie.comments);
+
+
+    this._updateData(USER_ACTION.DELETE_COMMENT, this._movie, UPDATE_TYPE.PATCH);
+  }
+
+//====================================================================================================================
 }
 
 export default Movie;

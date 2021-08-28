@@ -1,4 +1,5 @@
 import SmartView from './smart.js';
+import { USER_ACTION } from '../js/utils.js';
 
 const createFilmDetailsTemplate = (movie) => {
   const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, isEmoji, newCommentEmojiPath = null} = movie;
@@ -10,7 +11,7 @@ const createFilmDetailsTemplate = (movie) => {
   // const
 
   const renderDetailsComment = (commentsList) => commentsList.map((comment) =>
-    (`<li class="film-details__comment">
+    (`<li class="film-details__comment" id='${comment.id}'>
         <span class="film-details__comment-emoji">
           <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
         </span>
@@ -149,6 +150,7 @@ class MovieDetails extends SmartView {
     this._markAsWatchedDetailsButtonClick = this._markAsWatchedDetailsButtonClick.bind(this);
     this._toggleCommentEmojiHandler = this._toggleCommentEmojiHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._commentDeleteClickHandler = this._commentDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -156,8 +158,6 @@ class MovieDetails extends SmartView {
   getTemplate() {
     return createFilmDetailsTemplate(this._movie);
   }
-
-  // ==================================================================================================================================================================================
 
   reset(movie) {
     this.updateData(MovieDetails.restoreChanges(movie));
@@ -197,8 +197,6 @@ class MovieDetails extends SmartView {
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
   }
 
-  // ==================================================================================================================================================================================
-
   _setCloseMovieDetailsPopup(evt) {
     evt.preventDefault();
     this._callback.setCloseMovieDetailsPopup();
@@ -235,6 +233,26 @@ class MovieDetails extends SmartView {
     this._callback.markAsWatchedDetailsButtonClick = callback;
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._markAsWatchedDetailsButtonClick);
   }
+
+  // ==================================================================================================================================================================================
+
+  _commentDeleteClickHandler(evt) {
+    if(evt.target.tagName !== 'BUTTON') {
+      return;
+    }
+
+    evt.preventDefault();
+    this._callback.deleteComment(evt.currentTarget.id);
+  }
+
+  setDeleteCommentClickHandler(callback) {
+    this._callback.deleteComment = callback;
+    if(this._movie.comments.length > 0) {
+      this.getElement().querySelectorAll('.film-details__comment').forEach((element) => element.addEventListener('click', this._commentDeleteClickHandler));
+    }
+  }
+
+  // ==================================================================================================================================================================================
 
   static restoreChanges(data) {
     return Object.assign({}, data, {newCommentEmojiPath: null, isEmoji: false, commentMessage: null});

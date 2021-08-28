@@ -176,6 +176,7 @@ const generateComment = () => {
 
   const comments = new Array(commentsAmount).fill(null).map(() => (
     {
+      id: nanoid(),
       text: getRandomArrayProperty(COMMENTS_MOCK),
       emotion: getRandomArrayProperty(COMMENT_EMOTIONS),
       author: getRandomArrayProperty(COMMENT_AUTHOR),

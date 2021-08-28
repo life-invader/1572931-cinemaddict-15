@@ -27,7 +27,7 @@ class Movies extends AbstractObserver {
     this._notify(updateType, updateMovie);
   }
 
-  // addMovie(updateType, updateMovie) {
+  // addComment(updateType, updateMovie) {
   //   this._movies = [
   //     updateMovie,
   //     ...this._movies,
@@ -36,20 +36,25 @@ class Movies extends AbstractObserver {
   //   this._notify(updateType, updateMovie);
   // }
 
-  // deleteMovie(updateType, updateMovie) {
-  //   const index = this._movies.findIndex((item) => item.id === updateMovie.id);
+  deleteComment(updateType, updateMovie) {
+    const index = this._movies.findIndex((item) => item.id === updateMovie.id);
+    this._movies = [...this._movies.slice(0, index), updateMovie, ...this._movies.slice(index + 1)];
 
-  //   if (index === -1) {
-  //     throw new Error('Can\'t delete unexisting task');
-  //   }
+    console.log(updateMovie);
 
-  //   this._movies = [
-  //     ...this._movies.slice(0, index),
-  //     ...this._movies.slice(index + 1),
-  //   ];
+    // const index = this._movies.findIndex((item) => item.id === updateMovie.id);
 
-  //   this._notify(updateType);
-  // }
+    // if (index === -1) {
+    //   throw new Error('Can\'t delete unexisting task');
+    // }
+
+    // this._movies = [
+    //   ...this._movies.slice(0, index),
+    //   ...this._movies.slice(index + 1),
+    // ];
+
+    this._notify(updateType, updateMovie);
+  }
 }
 
 export default Movies;

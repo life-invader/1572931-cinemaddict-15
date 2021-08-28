@@ -193,11 +193,11 @@ class Board {
       case USER_ACTION.UPDATE_MOVIE:
         this._movieModel.updateMovie(updateType, updateMovie);
         break;
-      case USER_ACTION.ADD_MOVIE:
-        this._movieModel.addMovie(updateType, updateMovie);
+      case USER_ACTION.ADD_COMMENT:
+        this._movieModel.addComment(updateType, updateMovie);
         break;
-      case USER_ACTION.DELETE_MOVIE:
-        this._movieModel.deleteMovie(updateType, updateMovie);
+      case USER_ACTION.DELETE_COMMENT:
+        this._movieModel.deleteComment(updateType, updateMovie);
         break;
     }
   }
