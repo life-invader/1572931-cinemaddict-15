@@ -59,44 +59,17 @@ class Board {
   }
 
   _handleSortChange(sortType) {
-    // - Сортируем задачи
     if (this._currentSort === sortType) {
       return;
     }
 
     this._currentSort = sortType;
 
-    // // - Очищаем список
-    // this._clearMovieList();
-
-    // // Заменим View-компонент сортировки, чтобы подсветить нажатую кнопку
-    // this._renderSort();
-
-    // // - Рендерим список заново
-    // this._renderMovieList();
-
     this._clearBoard({resetRenderedTaskCount: true});
     this._renderBoard();
   }
 
   _renderSort() {
-    // const prevSortComponent = this._sortComponent;
-    // this._sortComponent = new SortView(this._currentSort);
-
-    // if(prevSortComponent !== null) {
-    //   if (this._boardContainer.contains(prevSortComponent.getElement())) {
-    //     replace(this._sortComponent, prevSortComponent);
-    //   }
-    // }
-
-    // if (prevSortComponent === null) {
-    //   render(this._boardContainer, this._sortComponent, RenderPosition.BEFOREEND);
-    // }
-
-    // this._sortComponent.setSortTypeChangeHandler(this._handleSortChange);
-
-    //==================>
-
     if(this._sortComponent !== null) {
       this._sortComponent = null;
     }
@@ -153,17 +126,6 @@ class Board {
     render(this._filmListComponent, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
 
   }
-
-  // _renderMovieList() {
-  //   const movieCount = this._getMovies().length;
-  //   const movies = this._getMovies().slice(0, Math.min(movieCount, SHOW_MORE_MOVIES_BUTTON_STEP));
-
-  //   this._renderMovieCards(movies);
-
-  //   if(movieCount > SHOW_MORE_MOVIES_BUTTON_STEP) {
-  //     this._renderShowMoreButton();
-  //   }
-  // }
 
   _handleViewAction(actionType, updateMovie, updateType) {
     // Здесь будем вызывать обновление модели.

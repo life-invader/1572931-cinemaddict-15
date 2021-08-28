@@ -103,17 +103,14 @@ class Movie {
   }
 
   _handleFavouriteButtonClick() {
-    // this._updateData(Object.assign({}, this._movie, {isFavourite: !this._movie.isFavourite}));
     this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isFavourite: !this._movie.isFavourite}), UPDATE_TYPE.PATCH);
   }
 
   _handleAddToWatchlistButtonClick() {
-    // this._updateData(Object.assign({}, this._movie, {isInWatchList: !this._movie.isInWatchList}));
     this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isInWatchList: !this._movie.isInWatchList}), UPDATE_TYPE.PATCH);
   }
 
   _handleMarkAsWatchedButtonClick() {
-    // this._updateData(Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}));
     this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}), UPDATE_TYPE.PATCH);
   }
 

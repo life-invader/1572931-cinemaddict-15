@@ -1,6 +1,5 @@
 import SmartView from './smart.js';
 import he from 'he';
-import { USER_ACTION } from '../js/utils.js';
 
 const createFilmDetailsTemplate = (movie) => {
   const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, isEmoji, newCommentEmojiPath = null} = movie;
@@ -173,8 +172,8 @@ class MovieDetails extends SmartView {
     const id = `#${evt.currentTarget.getAttribute('for')}`;
     const emoji = this.getElement().querySelector(id).value;
 
-    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, emoji: emoji, scroll: this.getElement().scrollTop});
-    this.getElement().scrollTop = this._movie.scroll;
+    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, emoji: emoji, scrollTop: this.getElement().scrollTop});
+    this.getElement().scrollTop = this._movie.scrollTop;
     this.getElement().querySelector(id).setAttribute('checked','checked');
 
     if(!this._movie.commentMessage) {
@@ -281,7 +280,7 @@ class MovieDetails extends SmartView {
   // ==================================================================================================================================================================================
 
   static restoreChanges(data) {
-    return Object.assign({}, data, {newCommentEmojiPath: null, isEmoji: false, commentMessage: null});
+    return Object.assign({}, data, {newCommentEmojiPath: null, isEmoji: false, commentMessage: null, scrollTop: null});
   }
 
   static addNewCommentEmoji(data) {
@@ -291,6 +290,7 @@ class MovieDetails extends SmartView {
       {
         isEmoji: false,
         newCommentEmojiPath: null,
+        scrollTop: null,
       },
     );
   }
