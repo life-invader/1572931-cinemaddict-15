@@ -144,7 +144,6 @@ class MovieDetails extends SmartView {
   constructor(movie, data) {
     super();
     this._movie = movie;
-    console.log(data);
 
     this._setCloseMovieDetailsPopup = this._setCloseMovieDetailsPopup.bind(this);
     this._favouriteDetailsButtonClick = this._favouriteDetailsButtonClick.bind(this);
@@ -164,7 +163,6 @@ class MovieDetails extends SmartView {
     }
     if(this._data.scrollTop) {
       this.getElement().scrollTop = this._data.scrollTop;
-      console.log(this._data.scrollTop);
     }
   }
 

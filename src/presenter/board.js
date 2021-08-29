@@ -149,17 +149,14 @@ class Board {
     switch (updateType) {
       case UPDATE_TYPE.PATCH:
         this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
-        console.log('PATCH');
         break;
       case UPDATE_TYPE.MINOR:
         this._clearBoard();
         this._renderBoard();
-        console.log('MINOR');
         break;
       case UPDATE_TYPE.MAJOR:
         this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
         this._renderBoard();
-        console.log('MAJOR');
         break;
     }
   }
