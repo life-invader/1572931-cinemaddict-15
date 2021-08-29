@@ -161,9 +161,6 @@ class MovieDetails extends SmartView {
     if(this._data.commentMessage) {
       this.getElement().querySelector('.film-details__comment-input').value = this._data.commentMessage;
     }
-    if(this._data.scrollTop) {
-      this.getElement().scrollTop = this._data.scrollTop;
-    }
   }
 
   getTemplate() {
@@ -172,7 +169,7 @@ class MovieDetails extends SmartView {
 
   reset(movie) {
     this._movie = movie;
-    this.updateData(MovieDetails.restoreChanges(movie));
+    this.updateData({newCommentEmojiPath: null, isEmoji: false, commentMessage: null, scrollTop: null, emoji: null});
   }
 
   _toggleCommentEmojiHandler(evt) {
@@ -272,11 +269,12 @@ class MovieDetails extends SmartView {
 
   _addNewCommentHandler(evt) {
     if(evt.key === 'Enter' && evt.ctrlKey) {
-      if(this._data.emoji) {
+      if(this._data.emoji && this._data.commentMessage) {
+        this.updateData({scrollTop: this.getElement().scrollTop}, true);
         this._callback.addNewComment(he.encode(this._data.commentMessage), this._data.emoji);
       } else {
         const commentInput =  this.getElement().querySelector('.film-details__comment-input');
-        commentInput.setCustomValidity('Выберите эмоцию!');
+        commentInput.setCustomValidity('Выберите эмоцию и напишите текст комментария!');
         commentInput.reportValidity();
       }
     }
@@ -289,23 +287,6 @@ class MovieDetails extends SmartView {
   }
 
   // ==================================================================================================================================================================================
-
-  static restoreChanges(data) {
-    return Object.assign({}, data, {newCommentEmojiPath: null, isEmoji: false, commentMessage: null, scrollTop: null, emoji: null});
-  }
-
-  // static addNewCommentEmoji(data) {
-  //   return Object.assign(
-  //     {},
-  //     data,
-  //     {
-  //       isEmoji: false,
-  //       newCommentEmojiPath: null,
-  //       scrollTop: null,
-  //     },
-  //   );
-  // }
-
 }
 
 export default MovieDetails;

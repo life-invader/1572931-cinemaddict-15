@@ -32,7 +32,7 @@ class Movie {
     const prevMovieDetailsComponent = this._movieDetailsComponent;
 
     this._movieComponent = new MovieCardView(movie);
-    this._movieDetailsComponent = new MovieDetailsView(movie, prevMovieDetailsComponent && prevMovieDetailsComponent._data || {});
+    this._movieDetailsComponent = new MovieDetailsView(movie, prevMovieDetailsComponent && prevMovieDetailsComponent.data || {});
 
     this._movieComponent.setMovieCardClick(this._handleOpenMovieDetails);
     this._movieDetailsComponent.setCloseMovieDetailsPopup(this._handleCloseMovieDetailsPopup);
@@ -48,21 +48,36 @@ class Movie {
     this._movieDetailsComponent.setAddNewCommentHandler(this._handleAddNewComment);
 
     if (prevMovieComponent === null || prevMovieDetailsComponent === null) {
-      render(this._movieListContainer, this._movieComponent, RenderPosition.BEFOREEND);
+      if (this._movieListContainer) {
+        render(this._movieListContainer, this._movieComponent, RenderPosition.BEFOREEND);
+      }
       return;
     }
 
-    if (this._movieListContainer.contains(prevMovieComponent.getElement())) {
+    if (this._movieListContainer && this._movieListContainer.contains(prevMovieComponent.getElement())) {
       replace(this._movieComponent, prevMovieComponent);
     }
 
     if(this._movieDetailsContainer.contains(prevMovieDetailsComponent.getElement())) {
       replace(this._movieDetailsComponent, prevMovieDetailsComponent);
+      this._movieDetailsComponent.getElement().scrollTop = this._movieDetailsComponent.data.scrollTop; // Не работает, не скролит до нужного места
     }
 
     // Зачем это нужно, хз. Взял из демо проекта. И без этой строки все работает
     // remove(prevMovieComponent);
   }
+
+  // ====================================================================================
+
+  isPopupOpened() {
+    return this._movieDetailsContainer.contains(this._movieDetailsComponent.getElement());
+  }
+
+  openPopup() {
+    this._handleOpenMovieDetails();
+  }
+
+  // ====================================================================================
 
   destroy() {
     remove(this._movieComponent);
@@ -114,7 +129,6 @@ class Movie {
     this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}), UPDATE_TYPE.MINOR);
   }
 
-  //====================================================================================================================
   _handleCommentDeleteClick(commentId) {
     const index = this._movie.comments.findIndex((comment) => comment.id === commentId);
     this._movie.comments = [...this._movie.comments.slice(0, index), ...this._movie.comments.slice(index + 1)];
@@ -136,7 +150,6 @@ class Movie {
     this._movieDetailsComponent.reset(this._movie);
   }
 
-//====================================================================================================================
 }
 
 export default Movie;

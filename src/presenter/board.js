@@ -150,9 +150,21 @@ class Board {
       case UPDATE_TYPE.PATCH:
         this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
         break;
-      case UPDATE_TYPE.MINOR:
+      case UPDATE_TYPE.MINOR: {
+        const isPopupOpened = this._moviePresenterMap.get(updateMovie.id).isPopupOpened();
         this._clearBoard();
         this._renderBoard();
+
+        let moviePresenter = this._moviePresenterMap.get(updateMovie.id);
+        if(!moviePresenter){
+          moviePresenter = new MoviePresenter(null, this._handleViewAction, this._handleModechange);
+          moviePresenter.init(updateMovie);
+          this._moviePresenterMap.set(updateMovie.id, moviePresenter);
+        }
+        if (moviePresenter && isPopupOpened) {
+          moviePresenter.openPopup();
+        }
+      }
         break;
       case UPDATE_TYPE.MAJOR:
         this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
