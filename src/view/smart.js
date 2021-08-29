@@ -3,7 +3,11 @@ import Abstract from './abstract.js';
 class Smart extends Abstract {
   constructor() {
     super();
-    this._movie = {};
+    this._data = {};
+  }
+
+  get data() {
+    return Object.assign({}, this._data);
   }
 
   updateData(update, justDataUpdating) {
@@ -11,7 +15,7 @@ class Smart extends Abstract {
       return;
     }
 
-    this._movie = Object.assign({}, this._movie, update);
+    this._data = Object.assign({}, this._data, update);
 
     if(justDataUpdating) {
       return;

@@ -32,7 +32,7 @@ class Movie {
     const prevMovieDetailsComponent = this._movieDetailsComponent;
 
     this._movieComponent = new MovieCardView(movie);
-    this._movieDetailsComponent = new MovieDetailsView(movie);
+    this._movieDetailsComponent = new MovieDetailsView(movie, prevMovieDetailsComponent && prevMovieDetailsComponent._data || {});
 
     this._movieComponent.setMovieCardClick(this._handleOpenMovieDetails);
     this._movieDetailsComponent.setCloseMovieDetailsPopup(this._handleCloseMovieDetailsPopup);
@@ -123,7 +123,7 @@ class Movie {
   }
 
   _handleAddNewComment(text, emotion) {
-    const obj = {
+    const newComment = {
       id: nanoid(),
       text: text,
       emotion: emotion,
@@ -131,8 +131,9 @@ class Movie {
       date: generateCommentDate(),
     };
 
-    this._movie.comments.push(obj);
+    this._movie.comments.push(newComment);
     this._updateData(USER_ACTION.ADD_COMMENT, this._movie, UPDATE_TYPE.PATCH);
+    this._movieDetailsComponent.reset(this._movie);
   }
 
 //====================================================================================================================

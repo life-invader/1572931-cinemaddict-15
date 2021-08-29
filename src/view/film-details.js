@@ -1,8 +1,9 @@
 import SmartView from './smart.js';
 import he from 'he';
 
-const createFilmDetailsTemplate = (movie) => {
-  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, isEmoji, newCommentEmojiPath = null} = movie;
+const createFilmDetailsTemplate = (movie, data) => {
+  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details} = movie;
+  const {isEmoji = false, newCommentEmojiPath = null, emoji} = data;
 
   const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
 
@@ -112,22 +113,22 @@ const createFilmDetailsTemplate = (movie) => {
                     </label>
 
                     <div class="film-details__emoji-list">
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile ${emoji === 'smile' ? 'checked' : ''}">
                       <label class="film-details__emoji-label" for="emoji-smile">
                         <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
                       </label>
 
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${emoji === 'sleeping' ? 'checked' : ''}>
                       <label class="film-details__emoji-label" for="emoji-sleeping">
                         <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
                       </label>
 
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${emoji === 'puke' ? 'checked' : ''}>
                       <label class="film-details__emoji-label" for="emoji-puke">
                         <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
                       </label>
 
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${emoji === 'angry' ? 'checked' : ''}>
                       <label class="film-details__emoji-label" for="emoji-angry">
                         <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
                       </label>
@@ -140,9 +141,10 @@ const createFilmDetailsTemplate = (movie) => {
 };
 
 class MovieDetails extends SmartView {
-  constructor(movie) {
+  constructor(movie, data) {
     super();
-    this._movie = MovieDetails.addNewCommentEmoji(movie);
+    this._movie = movie;
+    console.log(data);
 
     this._setCloseMovieDetailsPopup = this._setCloseMovieDetailsPopup.bind(this);
     this._favouriteDetailsButtonClick = this._favouriteDetailsButtonClick.bind(this);
@@ -154,18 +156,29 @@ class MovieDetails extends SmartView {
     this._addNewCommentHandler = this._addNewCommentHandler.bind(this);
 
     this._setInnerHandlers();
+
+    this.updateData(data || {});
+
+    if(this._data.commentMessage) {
+      this.getElement().querySelector('.film-details__comment-input').value = this._data.commentMessage;
+    }
+    if(this._data.scrollTop) {
+      this.getElement().scrollTop = this._data.scrollTop;
+      console.log(this._data.scrollTop);
+    }
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._movie);
+    return createFilmDetailsTemplate(this._movie, this._data);
   }
 
   reset(movie) {
+    this._movie = movie;
     this.updateData(MovieDetails.restoreChanges(movie));
   }
 
   _toggleCommentEmojiHandler(evt) {
-    if(this._movie.newCommentEmojiPath === evt.target.src) {
+    if(this._data.newCommentEmojiPath === evt.target.src) {
       return;
     }
 
@@ -173,14 +186,14 @@ class MovieDetails extends SmartView {
     const emoji = this.getElement().querySelector(id).value;
 
     this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, emoji: emoji, scrollTop: this.getElement().scrollTop});
-    this.getElement().scrollTop = this._movie.scrollTop;
+    this.getElement().scrollTop = this._data.scrollTop;
     this.getElement().querySelector(id).setAttribute('checked','checked');
 
-    if(!this._movie.commentMessage) {
+    if(!this._data.commentMessage) {
       return;
     }
 
-    this.getElement().querySelector('.film-details__comment-input').value = this._movie.commentMessage;
+    this.getElement().querySelector('.film-details__comment-input').value = this._data.commentMessage;
   }
 
   _commentInputHandler(evt) {
@@ -261,8 +274,8 @@ class MovieDetails extends SmartView {
 
   _addNewCommentHandler(evt) {
     if(evt.key === 'Enter' && evt.ctrlKey) {
-      if(this._movie.emoji) {
-        this._callback.addNewComment(he.encode(this._movie.commentMessage), this._movie.emoji);
+      if(this._data.emoji) {
+        this._callback.addNewComment(he.encode(this._data.commentMessage), this._data.emoji);
       } else {
         const commentInput =  this.getElement().querySelector('.film-details__comment-input');
         commentInput.setCustomValidity('Выберите эмоцию!');
@@ -280,20 +293,20 @@ class MovieDetails extends SmartView {
   // ==================================================================================================================================================================================
 
   static restoreChanges(data) {
-    return Object.assign({}, data, {newCommentEmojiPath: null, isEmoji: false, commentMessage: null, scrollTop: null});
+    return Object.assign({}, data, {newCommentEmojiPath: null, isEmoji: false, commentMessage: null, scrollTop: null, emoji: null});
   }
 
-  static addNewCommentEmoji(data) {
-    return Object.assign(
-      {},
-      data,
-      {
-        isEmoji: false,
-        newCommentEmojiPath: null,
-        scrollTop: null,
-      },
-    );
-  }
+  // static addNewCommentEmoji(data) {
+  //   return Object.assign(
+  //     {},
+  //     data,
+  //     {
+  //       isEmoji: false,
+  //       newCommentEmojiPath: null,
+  //       scrollTop: null,
+  //     },
+  //   );
+  // }
 
 }
 
