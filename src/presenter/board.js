@@ -4,11 +4,14 @@ import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на 
 import SortView from '../view/sort.js';
 // import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
+import UserStatisticsView from '../view/user-statistics.js'; // Кнопка показать еще
 import {render, RenderPosition, remove, sortByDate, sortByrating, SORT_BUTTONS, UPDATE_TYPE, USER_ACTION, filter} from '../js/utils.js';
 import MoviePresenter from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
 // const MOVIE_CARD_COUNT_EXTRA = 2;
+
+const mainElement = document.querySelector('.main');
 
 class Board {
   constructor(container, movieModel, filterModel) {
@@ -21,6 +24,7 @@ class Board {
 
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
+    this._userStatisticsComponent = new UserStatisticsView();
 
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
@@ -145,7 +149,7 @@ class Board {
     }
   }
 
-  _handleModelEvent(updateType, updateMovie) {
+  _handleModelEvent(updateType, updateMovie, renderStatistics = false) {
     switch (updateType) {
       case UPDATE_TYPE.PATCH:
         this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
@@ -167,13 +171,13 @@ class Board {
       }
         break;
       case UPDATE_TYPE.MAJOR:
-        this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
-        this._renderBoard();
+        this._clearBoard({resetRenderedTaskCount: true, resetSortType: true, renderStatistics: true});
+        this._renderBoard(renderStatistics);
         break;
     }
   }
 
-  _clearBoard({resetRenderedTaskCount = false, resetSortType = false} = {}) {
+  _clearBoard({resetRenderedTaskCount = false, resetSortType = false, renderStatistics = false} = {}) {
     const movieCount = this._getMovies().length;
 
     this._moviePresenterMap.forEach((presenter) => presenter.destroy());
@@ -195,9 +199,23 @@ class Board {
     if (resetSortType) {
       this._currentSort = SORT_BUTTONS.default;
     }
+
+    if (renderStatistics) {
+      remove(this._userStatisticsComponent);
+    }
   }
 
-  _renderBoard() {
+  _renderStatistics() {
+    render(mainElement, this._userStatisticsComponent, RenderPosition.BEFOREEND); // Статистика юзера
+  }
+
+  _renderBoard(renderStatistics) {
+    if (renderStatistics) {
+      remove(this._boardComponent);
+      this._renderStatistics();
+      return;
+    }
+
     const movies = this._getMovies();
     const moviesCount = movies.length;
 

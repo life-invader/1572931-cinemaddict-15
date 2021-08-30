@@ -13,7 +13,7 @@ const createMenuTemplate = (filters, currentFilter) => {
               <a href="#history" data-filter='${FILTER_TYPE.history}' class="main-navigation__item main-navigation__history ${currentFilter === FILTER_TYPE.history ? 'main-navigation__item--active' : ''}">History <span class="main-navigation__item-count">${watchedAmount}</span></a>
               <a href="#favorites" data-filter='${FILTER_TYPE.favourites}' class="main-navigation__item main-navigation__item-favourites ${currentFilter === FILTER_TYPE.favourites ? 'main-navigation__item--active' : ''}">Favorites <span class="main-navigation__item-count">${isFavourite}</span></a>
             </div>
-            <a href="#stats" class="main-navigation__additional">Stats</a>
+            <a href="#stats" data-filter='${FILTER_TYPE.statistics}' class="main-navigation__additional ${currentFilter === FILTER_TYPE.statistics ? 'main-navigation__item--active' : ''}">Stats</a>
           </nav>`;
 };
 

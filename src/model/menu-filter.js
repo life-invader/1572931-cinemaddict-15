@@ -7,9 +7,9 @@ class MenuFilter extends AbstractObserver {
     this._activeFilter = FILTER_TYPE.all;
   }
 
-  setFilter(updateType, filter) {
+  setFilter(updateType, filter, renderStatistics) {
     this._activeFilter = filter;
-    this._notify(updateType, filter);
+    this._notify(updateType, filter, renderStatistics);
   }
 
   getFilter() {

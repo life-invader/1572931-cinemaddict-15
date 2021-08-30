@@ -18,6 +18,7 @@ const FILTER_TYPE = {
   watchlist: 'watchlist',
   history: 'history',
   favourites: 'favourites',
+  statistics: 'statistics',
 };
 
 const filter = {
@@ -25,12 +26,14 @@ const filter = {
   [FILTER_TYPE.watchlist]: (movies) => movies.filter((movie) => movie.isInWatchList === true),
   [FILTER_TYPE.history]: (movies) => movies.filter((movie) => movie.isWatched === true),
   [FILTER_TYPE.favourites]: (movies) => movies.filter((movie) => movie.isFavourite === true),
+  [FILTER_TYPE.statistics]: (movies) => movies.slice(),
 };
 
 const SORT_BUTTONS = {
   default: 'default',
   byDate: 'byDate',
   byRating: 'byRating',
+  statistics: 'statistics',
 };
 
 const RenderPosition = {

@@ -12,7 +12,7 @@ class MenuFilter {
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._moviesModel.addObserver(this._handleModelEvent);
+    // this._moviesModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
@@ -41,6 +41,11 @@ class MenuFilter {
       return;
     }
 
+    if(filterType === FILTER_TYPE.statistics) {
+      this._filterModel.setFilter(UPDATE_TYPE.MAJOR, filterType, true);
+      return;
+    }
+
     this._filterModel.setFilter(UPDATE_TYPE.MAJOR, filterType);
   }
 
@@ -59,6 +64,10 @@ class MenuFilter {
       {
         name: FILTER_TYPE.favourites,
         count: filter[FILTER_TYPE.favourites](movies).length,
+      },
+      {
+        name: FILTER_TYPE.statistics,
+        count: null,
       },
     ];
   }
