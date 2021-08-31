@@ -36,12 +36,19 @@ class Board {
     this._handleModechange = this._handleModechange.bind(this);
     this._handleSortChange = this._handleSortChange.bind(this);
 
-    this._movieModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
+    this._movieModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     this._renderBoard();
+  }
+
+  destroy() {
+    this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
+
+    remove(this._boardComponent);
   }
 
   _getMovies() {
@@ -149,7 +156,7 @@ class Board {
     }
   }
 
-  _handleModelEvent(updateType, updateMovie, renderStatistics = false) {
+  _handleModelEvent(updateType, updateMovie) {
     switch (updateType) {
       case UPDATE_TYPE.PATCH:
         this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
@@ -171,13 +178,13 @@ class Board {
       }
         break;
       case UPDATE_TYPE.MAJOR:
-        this._clearBoard({resetRenderedTaskCount: true, resetSortType: true, renderStatistics: true});
-        this._renderBoard(renderStatistics);
+        this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
+        this._renderBoard();
         break;
     }
   }
 
-  _clearBoard({resetRenderedTaskCount = false, resetSortType = false, renderStatistics = false} = {}) {
+  _clearBoard({resetRenderedTaskCount = false, resetSortType = false} = {}) {
     const movieCount = this._getMovies().length;
 
     this._moviePresenterMap.forEach((presenter) => presenter.destroy());
@@ -199,23 +206,13 @@ class Board {
     if (resetSortType) {
       this._currentSort = SORT_BUTTONS.default;
     }
-
-    if (renderStatistics) {
-      remove(this._userStatisticsComponent);
-    }
   }
 
   _renderStatistics() {
     render(mainElement, this._userStatisticsComponent, RenderPosition.BEFOREEND); // Статистика юзера
   }
 
-  _renderBoard(renderStatistics) {
-    if (renderStatistics) {
-      remove(this._boardComponent);
-      this._renderStatistics();
-      return;
-    }
-
+  _renderBoard() {
     const movies = this._getMovies();
     const moviesCount = movies.length;
 

@@ -16,12 +16,14 @@ class MenuFilter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
+  init(showStatistics) {
     const filters = this._getFilters();
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new MenuTemplateView(filters, this._filterModel.getFilter());
     this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
+
+    this._showStatistics = showStatistics;
 
     if(prevFilterComponent === null) {
       render(this._menuFilterContainer, this._filterComponent, RenderPosition.AFTERBEGIN);
@@ -33,7 +35,7 @@ class MenuFilter {
   }
 
   _handleModelEvent() {
-    this.init();
+    this.init(this._showStatistics);
   }
 
   _handleFilterTypeChange(filterType) {
@@ -42,11 +44,13 @@ class MenuFilter {
     }
 
     if(filterType === FILTER_TYPE.statistics) {
-      this._filterModel.setFilter(UPDATE_TYPE.MAJOR, filterType, true);
+      this._filterModel.setFilter(UPDATE_TYPE.MAJOR, filterType);
+      this._showStatistics(FILTER_TYPE.statistics);
       return;
     }
 
     this._filterModel.setFilter(UPDATE_TYPE.MAJOR, filterType);
+    this._showStatistics(filterType);
   }
 
   _getFilters() {
