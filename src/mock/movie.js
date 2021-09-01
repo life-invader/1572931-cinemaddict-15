@@ -146,10 +146,10 @@ const generatePoster = () => {
 const generateMovieRating = () => randomFloat();
 
 const generateMovieDuration = () => {
-  const hours = getRandomInteger(1, 3);
-  const minutes = getRandomInteger(10, 59);
+  // const hours = getRandomInteger(1, 3);
+  const minutes = getRandomInteger(40, 120);
 
-  return `${hours}h ${minutes}m`;
+  return minutes;
 };
 
 const generateReleaseDate = () => {

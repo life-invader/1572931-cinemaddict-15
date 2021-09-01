@@ -10,6 +10,7 @@ import MovieModel from './model/movie.js';
 import MenuFilterModel from './model/menu-filter.js';
 
 const moviesMock = new Array(25).fill(null).map(generateMovie);
+console.log(moviesMock);
 
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');

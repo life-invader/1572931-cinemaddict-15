@@ -1,22 +1,32 @@
 import SmartView from './smart.js';
-
 import Chart from 'chart.js';
 import ChartDataLabels  from 'chartjs-plugin-datalabels';
 
-const renderChart = (statisticCtx) => {
+const BUTTONS = {
+  AllTime: 'all-time',
+  Today: 'today',
+  Week: 'Week',
+  Month: 'month',
+  Year: 'year',
+};
+
+const renderChart = (statisticCtx, data) => {
   const BAR_HEIGHT = 50;
-  // const statisticCtx = document.querySelector('.statistic__chart');
+
+  const watchedMovies = data.filter((movie) => movie.isWatched);
+  const genres = [...new Set(watchedMovies.map((movie) => movie.genre))];
+  const amount = genres.map((genre) => watchedMovies.filter((movie) => movie.genre === genre).length);
 
   // Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
-  statisticCtx.height = BAR_HEIGHT * 5;
+  statisticCtx.height = BAR_HEIGHT * genres.length;
 
   const myChart = new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: ['Sci-Fi', 'Animation', 'Fantasy', 'Comedy', 'TV Series'],
+      labels: genres,
       datasets: [{
-        data: [11, 8, 7, 4, 3],
+        data: amount,
         backgroundColor: '#ffe800',
         hoverBackgroundColor: '#ffe800',
         anchor: 'start',
@@ -70,8 +80,39 @@ const renderChart = (statisticCtx) => {
   return myChart;
 };
 
-const createUserStatisticsTemplate = () => (
-  `<section class="statistic">
+const createUserStatisticsTemplate = (data) => {
+  const moviesAmount = data.filter((movie) => movie.isWatched === true);
+  const movieDuration = moviesAmount.map((movie) => movie.duration);
+  let totalDuration;
+
+  if(movieDuration.length > 0) {
+    totalDuration = movieDuration.reduce((accumulator, movie) => accumulator + movie);
+  }
+
+  const genres = moviesAmount.map((movie) => movie.genre);
+  let topGenre;
+
+  //=============================================
+
+  const count = genres.reduce((acc, n) => (acc[n] = (acc[n] || 0) + 1, acc), {});
+  // console.log(count)
+  const uniqueGenres = Object.entries(count).map((i) => i[0]);
+  // console.log(uniqueGenres);
+  const amountOfEachGenre = Object.entries(count).map((i) => i[1]);
+  // console.log(amountOfEachGenre);
+  const maxNumber = Math.max(...Object.entries(count).map((i) => i[1]));
+  // console.log(maxNumber);
+  let maxNumberIndex;
+  if(maxNumber >= 0) {
+    maxNumberIndex = amountOfEachGenre.indexOf(maxNumber);
+    // console.log(maxNumberIndex)
+    topGenre = uniqueGenres[maxNumberIndex];
+  }
+  // const duplicateCount = Object.values(count).filter((n) => n > 1).length;
+
+  //====================
+
+  return `<section class="statistic">
     <p class="statistic__rank">
       Your rank
       <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
@@ -100,15 +141,15 @@ const createUserStatisticsTemplate = () => (
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${moviesAmount.length} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+        <p class="statistic__item-text">${(totalDuration / 60).toFixed()} <span class="statistic__item-description">h</span> ${(totalDuration % 60).toFixed()} <span class="statistic__item-description">m</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">Sci-Fi</p>
+        <p class="statistic__item-text">${topGenre}</p>
       </li>
     </ul>
 
@@ -116,43 +157,39 @@ const createUserStatisticsTemplate = () => (
       <canvas class="statistic__chart" width="1000"></canvas>
     </div>
 
-  </section>`
-);
+  </section>`;
+};
 
 class UserStatistics extends SmartView {
-  constructor() {
+  constructor(data = []) {
     super();
 
-    this._menuClickHandler = this._menuClickHandler.bind(this);
-
-    this._run();
+    this._data = data;
+    this._setChart();
   }
 
   getTemplate() {
-    return createUserStatisticsTemplate();
+    return createUserStatisticsTemplate(this._data);
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuClick(evt.target.value);
+  // setMenuItem(menuItem) {
+  //   const item = this.getElement().querySelector(`[value=${menuItem}]`);
+
+  //   if (item !== null) {
+  //     item.checked = true;
+  //   }
+  // }
+
+  _handleChartButtonsClickHandler() {
+    this.getElement().addEventListener('change', (evt) => {
+      console.log(evt.target);
+    });
   }
 
-  setMenuClickHandler(callback) {
-    this._callback.menuClick = callback;
-    this.getElement().addEventListener('change', this._menuClickHandler);
-  }
-
-  setMenuItem(menuItem) {
-    const item = this.getElement().querySelector(`[value=${menuItem}]`);
-
-    if (item !== null) {
-      item.checked = true;
-    }
-  }
-
-  _run() {
+  _setChart() {
     const statisticCtx = this.getElement().querySelector('.statistic__chart');
-    this._chart = renderChart(statisticCtx);
+    this._chart = renderChart(statisticCtx, this._data);
+    this._handleChartButtonsClickHandler();
   }
 }
 
