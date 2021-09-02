@@ -2,7 +2,10 @@ import dayjs from 'dayjs';
 import objectSupport from 'dayjs/plugin/objectSupport';
 import {getRandomInteger, randomFloat} from '../js/utils.js';
 import {nanoid} from 'nanoid';
+
+import duration from 'dayjs/plugin/duration';
 dayjs.extend(objectSupport);
+dayjs.extend(duration);
 
 const MIN_COMMENTS_AMOUNT = 0;
 const MAX_COMMENTS_AMOUNT = 5;
@@ -22,6 +25,8 @@ const MIN_MINUTES_AMOUNT = 1;
 const MAX_MINUTES_AMOUNT = 59;
 const MIN_HOURS_AMOUNT = 1;
 const MAX_HOURS_AMOUNT = 23;
+
+const WATCHING_DATE = ['today', 'month', 'week', 'year'];
 
 const FIRST_NAMES = [
   'Erik',
@@ -228,6 +233,30 @@ const generateMovieDetails = () => ({
   genres: generateMovieGenres(),
 });
 
+const generateWatchingDate = () => {
+  const index = getRandomArrayProperty(WATCHING_DATE);
+  let date;
+
+  switch (index) {
+    case 'week':
+      date = dayjs().subtract(3, 'day');
+      break;
+    case 'year':
+      date = dayjs().subtract(15, 'month');
+      break;
+    case 'month':
+      date = dayjs().subtract(15, 'day');
+      break;
+    case 'today':
+      date = dayjs().subtract(6, 'hour');
+      break;
+    default:
+      date = dayjs();
+  }
+
+  return date;
+};
+
 const generateMovie = () => (
   {
     id: nanoid(),
@@ -242,6 +271,7 @@ const generateMovie = () => (
     isWatched: Boolean(getRandomInteger(0, 1)),
     isFavourite: Boolean(getRandomInteger(0, 1)),
     details: generateMovieDetails(),
+    'watching_date': generateWatchingDate(),
   }
 );
 

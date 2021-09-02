@@ -2,10 +2,16 @@ import SmartView from './smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels  from 'chartjs-plugin-datalabels';
 
+import dayjs from 'dayjs';
+import objectSupport from 'dayjs/plugin/objectSupport';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(objectSupport);
+dayjs.extend(duration);
+
 const BUTTONS = {
   AllTime: 'all-time',
   Today: 'today',
-  Week: 'Week',
+  Week: 'week',
   Month: 'month',
   Year: 'year',
 };
@@ -81,24 +87,24 @@ const renderChart = (statisticCtx, data) => {
 };
 
 const createUserStatisticsTemplate = (data) => {
-  const moviesAmount = data.filter((movie) => movie.isWatched === true);
-  const movieDuration = moviesAmount.map((movie) => movie.duration);
+  // console.log(data);
+  const movieDuration = data.map((movie) => movie.duration);
   let totalDuration;
 
   if(movieDuration.length > 0) {
     totalDuration = movieDuration.reduce((accumulator, movie) => accumulator + movie);
   }
 
-  const genres = moviesAmount.map((movie) => movie.genre);
+  const genres = data.map((movie) => movie.genre);
   let topGenre;
 
   //=============================================
 
   const count = genres.reduce((acc, n) => (acc[n] = (acc[n] || 0) + 1, acc), {});
   // console.log(count)
-  const uniqueGenres = Object.entries(count).map((i) => i[0]);
+  const uniqueGenres = Object.entries(count).map((i) => i[0]); // Object.keys()
   // console.log(uniqueGenres);
-  const amountOfEachGenre = Object.entries(count).map((i) => i[1]);
+  const amountOfEachGenre = Object.entries(count).map((i) => i[1]); // Object.values()
   // console.log(amountOfEachGenre);
   const maxNumber = Math.max(...Object.entries(count).map((i) => i[1]));
   // console.log(maxNumber);
@@ -141,7 +147,7 @@ const createUserStatisticsTemplate = (data) => {
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">${moviesAmount.length} <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${data.length} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
@@ -164,32 +170,52 @@ class UserStatistics extends SmartView {
   constructor(data = []) {
     super();
 
-    this._data = data;
+    this._movies = data.filter((movie) => movie.isWatched);
+    this._sortedMovies = this._movies;
+    this._setChartButtonsClickHandler();
     this._setChart();
   }
 
   getTemplate() {
-    return createUserStatisticsTemplate(this._data);
+    return createUserStatisticsTemplate(this._sortedMovies);
   }
 
-  // setMenuItem(menuItem) {
-  //   const item = this.getElement().querySelector(`[value=${menuItem}]`);
+  restoreHandlers() {
+    this._setChartButtonsClickHandler();
+  }
 
-  //   if (item !== null) {
-  //     item.checked = true;
-  //   }
-  // }
+  _getMovies(button) {
+    switch (button) {
+      case BUTTONS.Today:
+        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'hours') < 24);
+        break;
+      case BUTTONS.Week:
+        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'day') < 7);
+        break;
+      case BUTTONS.Month:
+        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'day') < 30);
+        break;
+      case BUTTONS.Year:
+        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'month') < 12);
+        break;
+      case BUTTONS.AllTime:
+        this._sortedMovies = this._movies;
+        break;
+    }
+  }
 
-  _handleChartButtonsClickHandler() {
+  _setChartButtonsClickHandler() {
     this.getElement().addEventListener('change', (evt) => {
-      console.log(evt.target);
+      this._getMovies(evt.target.value);
+      this.updateData({buttonId: `#${evt.target.id}`});
+      this.getElement().querySelector(this._data.buttonId).checked = true;
+      this._setChart();
     });
   }
 
   _setChart() {
     const statisticCtx = this.getElement().querySelector('.statistic__chart');
-    this._chart = renderChart(statisticCtx, this._data);
-    this._handleChartButtonsClickHandler();
+    this._chart = renderChart(statisticCtx, this._sortedMovies);
   }
 }
 
