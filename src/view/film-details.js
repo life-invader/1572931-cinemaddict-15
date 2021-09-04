@@ -1,13 +1,13 @@
 import SmartView from './smart.js';
 import he from 'he';
+import dayjs from 'dayjs';
 
 const createFilmDetailsTemplate = (movie, data) => {
   const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details} = movie;
   const {isEmoji = false, newCommentEmojiPath = null, emoji} = data;
 
-  // const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
-  const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate;
-
+  const formatMovieReleaseDate = (movieReleaseDate) => dayjs(movieReleaseDate).format('DD MMMM YYYY');
+  const formatDuration = (movieDuration) => dayjs().startOf('day').add(movieDuration, 'minute').format('H[h] mm[m]');
   const renderDetailsGenre = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
 
   // const
@@ -71,7 +71,7 @@ const createFilmDetailsTemplate = (movie, data) => {
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Runtime</td>
-                        <td class="film-details__cell">${duration}</td>
+                        <td class="film-details__cell">${formatDuration(duration)}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Country</td>

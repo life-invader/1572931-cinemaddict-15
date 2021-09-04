@@ -92,6 +92,12 @@ class Movies extends AbstractObserver {
           'total_rating': movie.rating,
           writers: movie['details'].writers,
         },
+        'user_details': {
+          watchlist: movie.isInWatchList,
+          'already_watched': movie.isWatched,
+          'watching_date': movie['watching_date'],
+          favorite: movie.isFavourite,
+        },
       },
     );
 

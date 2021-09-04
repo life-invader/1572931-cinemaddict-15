@@ -22,7 +22,7 @@ const footerElement = document.querySelector('.footer');
 const menuFilterModel = new MenuFilterModel();
 const movieModel = new MovieModel();
 // movieModel.setMovies(moviesMock);
-const boardPresenter = new BoardPresenter(mainElement, movieModel, menuFilterModel);
+const boardPresenter = new BoardPresenter(mainElement, movieModel, menuFilterModel, api);
 const menuFilterPresenter = new MenuFilterPresenter(mainElement, movieModel, menuFilterModel);
 
 
@@ -49,19 +49,11 @@ const handleUserStatisticsClick = (menuItem = 'statistics') => {
 menuFilterPresenter.init(handleUserStatisticsClick);
 boardPresenter.init();
 
-// api.getMovies().then((movies) => {
-//   movieModel.setMovies(movies);
-//   console.log(movies[0]);
-// });
-
 api.getMovies()
   .then((movies) => {
     movieModel.setMovies(UPDATE_TYPE.INIT, movies);
-    console.log('then');
+    console.log(movies);
   })
   .catch(() => {
     movieModel.setMovies(UPDATE_TYPE.INIT, []);
-    console.log('catch');
   });
-
-// console.log(moviesMock[0]);

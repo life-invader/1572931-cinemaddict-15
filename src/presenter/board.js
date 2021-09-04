@@ -15,13 +15,14 @@ const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
 const mainElement = document.querySelector('.main');
 
 class Board {
-  constructor(container, movieModel, filterModel) {
+  constructor(container, movieModel, filterModel, api) {
     this._boardContainer = container;
     this._movieModel = movieModel;
     this._filterModel = filterModel;
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
     this._currentSort = SORT_BUTTONS.default;
     this._isLoading = true;
+    this._api = api;
     this._moviePresenterMap = new Map();
 
     this._boardComponent = new BoardView();
@@ -147,13 +148,9 @@ class Board {
   }
 
   _handleViewAction(actionType, updateMovie, updateType) {
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
     switch (actionType) {
       case USER_ACTION.UPDATE_MOVIE:
-        this._movieModel.updateMovie(updateType, updateMovie);
+        this._api.updateMovie(updateMovie).then((response) => this._movieModel.updateMovie(updateType, response));
         break;
       case USER_ACTION.ADD_COMMENT:
         this._movieModel.addComment(updateType, updateMovie);
@@ -231,8 +228,6 @@ class Board {
       this._renderLoading();
       return;
     }
-
-    remove(this._loadingComponent);
 
     const movies = this._getMovies();
     const moviesCount = movies.length;
