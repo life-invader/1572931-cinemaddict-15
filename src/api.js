@@ -10,8 +10,8 @@ const SuccessHTTPStatusRange = {
 
 class Api {
   constructor(endPoint, authorization) {
-    this._endPoint = endPoint;
-    this._authorization = authorization;
+    this._endPoint = endPoint; // ссылка на сервер https://15.ecmascript.pages.academy/cinemaddict/;
+    this._authorization = authorization;  // Basic kgji4783jcfigdf
   }
 
   getMovies() {
