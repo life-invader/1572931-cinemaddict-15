@@ -6,14 +6,14 @@ import {nanoid} from 'nanoid';
 import {getRandomArrayProperty, COMMENT_AUTHOR, generateCommentDate} from '../mock/movie.js';
 
 class Movie {
-  constructor(movieListContainer, updateData, changeMode) {
+  constructor(movieListContainer, updateData, changeMode, api) {
     this._movieListContainer = movieListContainer;
     this._updateData = updateData;
     this._changeMode = changeMode;
+    this._api = api;
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
-    this._commentsToShow = null;
 
     this._handleOpenMovieDetails = this._handleOpenMovieDetails.bind(this);
     this._handleCloseMovieDetailsPopup = this._handleCloseMovieDetailsPopup.bind(this);
@@ -33,7 +33,7 @@ class Movie {
     const prevMovieDetailsComponent = this._movieDetailsComponent;
 
     this._movieComponent = new MovieCardView(movie);
-    this._movieDetailsComponent = new MovieDetailsView(movie, prevMovieDetailsComponent && prevMovieDetailsComponent.data || {});
+    this._movieDetailsComponent = new MovieDetailsView(movie, this._comments, prevMovieDetailsComponent && prevMovieDetailsComponent.data || {});
 
     this._movieComponent.setMovieCardClick(this._handleOpenMovieDetails);
     this._movieDetailsComponent.setCloseMovieDetailsPopup(this._handleCloseMovieDetailsPopup);
@@ -89,16 +89,6 @@ class Movie {
     this._handleCloseMovieDetailsPopup();
   }
 
-  _getComments(movieId) {
-    return fetch(`https://15.ecmascript.pages.academy/cinemaddict/comments/${movieId}`, {
-      headers: {
-        'Authorization': 'Basic kgji4783jcfigdf',
-      },
-    })
-      .then((response) => response.json())
-      .then((comments) => this._commentsToShow = comments);
-  }
-
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       if (evt.target.tagName === 'INPUT' || evt.target.tagName === 'TEXTAREA') {
@@ -118,9 +108,12 @@ class Movie {
 
   _renderMovieDetails() {
     document.addEventListener('keydown', this._onEscKeyDown);
-    this._getComments(this._movie.id);
     render(this._movieDetailsContainer, this._movieDetailsComponent, RenderPosition.BEFOREEND);
-    console.log(this._movieDetailsComponent);
+    this._api.getComments(this._movie.id)
+      .then((comments) => {
+        this._comments = comments;
+        this._movieDetailsComponent.setComments(comments);
+      });
   }
 
   _handleOpenMovieDetails() {

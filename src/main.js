@@ -52,8 +52,8 @@ boardPresenter.init();
 api.getMovies()
   .then((movies) => {
     movieModel.setMovies(UPDATE_TYPE.INIT, movies);
-    console.log(movies);
   })
   .catch(() => {
     movieModel.setMovies(UPDATE_TYPE.INIT, []);
+    throw new Error('Ошибка');
   });

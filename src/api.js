@@ -35,6 +35,12 @@ class Api {
       .then(MovieModel.adaptToClient);
   }
 
+  getComments(movieId) {
+    return this._load({url: `comments/${movieId}`})
+      .then(Api.toJSON)
+      .then((comments) => comments);
+  }
+
   // addComment(movie) {
   //   return this._load({
   //     url: `comments/${movie.id}`,

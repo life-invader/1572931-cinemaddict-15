@@ -96,7 +96,7 @@ class Board {
 
   _renderMovieCard(movie) {
     const movieContainer = this._filmListComponent.getElement().querySelector('.films-list__container');
-    const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange);
+    const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
     moviePresenter.init(movie);
     this._moviePresenterMap.set(movie.id, moviePresenter);
   }
@@ -173,7 +173,7 @@ class Board {
 
         let moviePresenter = this._moviePresenterMap.get(updateMovie.id);
         if(!moviePresenter){
-          moviePresenter = new MoviePresenter(null, this._handleViewAction, this._handleModechange);
+          moviePresenter = new MoviePresenter(null, this._handleViewAction, this._handleModechange, this._api);
           moviePresenter.init(updateMovie);
           this._moviePresenterMap.set(updateMovie.id, moviePresenter);
         }

@@ -1,14 +1,18 @@
 import SmartView from './smart.js';
 import he from 'he';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
-const createFilmDetailsTemplate = (movie, data) => {
-  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, ageRating} = movie;
+dayjs.extend(relativeTime);
+
+const createFilmDetailsTemplate = (movie, data, comments) => {
+  const {name, rating, duration, description, poster, isInWatchList, isWatched, isFavourite, details, ageRating} = movie;
   const {isEmoji = false, newCommentEmojiPath = null, emoji} = data;
 
   const formatMovieReleaseDate = (movieReleaseDate) => dayjs(movieReleaseDate).format('DD MMMM YYYY');
   const formatDuration = (movieDuration) => dayjs().startOf('day').add(movieDuration, 'minute').format('H[h] mm[m]');
   const renderDetailsGenre = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
+  const formatCommentDate = (date) => dayjs(date).fromNow();
 
   // const
 
@@ -18,10 +22,10 @@ const createFilmDetailsTemplate = (movie, data) => {
           <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-smile">
         </span>
         <div>
-          <p class="film-details__comment-text">${comment.text}</p>
+          <p class="film-details__comment-text">${comment.comment}</p>
           <p class="film-details__comment-info">
             <span class="film-details__comment-author">${comment.author}</span>
-            <span class="film-details__comment-day">${comment.date}</span>
+            <span class="film-details__comment-day">${formatCommentDate(comment.date)}</span>
             <button class="film-details__comment-delete">Delete</button>
           </p>
         </div>
@@ -98,11 +102,11 @@ const createFilmDetailsTemplate = (movie, data) => {
 
               <div class="film-details__bottom-container">
                 <section class="film-details__comments-wrap">
-                  <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+                  <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments ? comments.length : 0}</span></h3>
 
                   <ul class="film-details__comments-list">
 
-                    ${renderDetailsComment(comments)}
+                    ${comments ? renderDetailsComment(comments) : ''}
 
                   </ul>
 
@@ -142,9 +146,10 @@ const createFilmDetailsTemplate = (movie, data) => {
 };
 
 class MovieDetails extends SmartView {
-  constructor(movie, data) {
+  constructor(movie, comments, data) {
     super();
     this._movie = movie;
+    this._comments = comments;
 
     this._setCloseMovieDetailsPopup = this._setCloseMovieDetailsPopup.bind(this);
     this._favouriteDetailsButtonClick = this._favouriteDetailsButtonClick.bind(this);
@@ -165,7 +170,12 @@ class MovieDetails extends SmartView {
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._movie, this._data);
+    return createFilmDetailsTemplate(this._movie, this._data, this._comments);
+  }
+
+  setComments(comments) {
+    this._comments = comments.slice();
+    this.updateData({});
   }
 
   reset(movie) {
