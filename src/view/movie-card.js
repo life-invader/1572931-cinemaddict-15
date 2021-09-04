@@ -1,7 +1,7 @@
 import AbstractView from './abstract.js';
 
 const createMovieCardTemplate = (filmCard) => {
-  const {name, rating, details, duration, genre, description, comments, poster, isInWatchList, isWatched, isFavourite} = filmCard;
+  const {name, rating, details, duration, description, comments, poster, isInWatchList, isWatched, isFavourite} = filmCard;
 
   const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('YYYY');
 
@@ -11,7 +11,7 @@ const createMovieCardTemplate = (filmCard) => {
             <p class="film-card__info">
               <span class="film-card__year">${formatMovieReleaseDate(details.releaseDate)}</span>
               <span class="film-card__duration">${duration}</span>
-              <span class="film-card__genre">${genre}</span>
+              <span class="film-card__genre">${details.genres[0]}</span>
             </p>
             <img src="${poster}" alt="" class="film-card__poster">
             <p class="film-card__description">${description}</p>

@@ -127,11 +127,6 @@ const getRandomArrayProperty = (array) => {
   return array[index];
 };
 
-const generateGenre = () => {
-  const index = getRandomInteger(0, GENRES.length - 1);
-  return GENRES[index];
-};
-
 const generateMovieName = () => {
   const index = getRandomInteger(0, MOVIE_NAME_MOCK.length - 1);
   return MOVIE_NAME_MOCK[index];
@@ -261,7 +256,6 @@ const generateMovie = () => (
   {
     id: nanoid(),
     name: generateMovieName(),
-    genre: generateGenre(),
     rating: generateMovieRating(),
     duration: generateMovieDuration(),
     poster: generatePoster(),

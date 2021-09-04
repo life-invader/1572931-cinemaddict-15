@@ -49,4 +49,5 @@ function handleUserStatisticsClick(menuItem = 'statistics') {
   render(mainElement, userStatisticsComponent, RenderPosition.BEFOREEND); // Статистика юзера
 }
 
-api.getMovies().then((movies) => console.log(movies));
+api.getMovies().then((movies) => console.log(movies[0]));
+console.log(moviesMock[0]);
