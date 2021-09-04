@@ -6,8 +6,9 @@ class Movies extends AbstractObserver {
     this._movies = [];
   }
 
-  setMovies(movies) {
+  setMovies(updateType, movies) {
     this._movies = movies.slice();
+    this._notify(updateType);
   }
 
   getMovies() {
@@ -96,6 +97,7 @@ class Movies extends AbstractObserver {
 
     // Ненужные ключи мы удаляем
     delete adaptedMovie.name;
+    delete adaptedMovie.alternativeName;
     delete adaptedMovie.rating;
     delete adaptedMovie.duration;
     delete adaptedMovie.poster;
@@ -103,6 +105,7 @@ class Movies extends AbstractObserver {
     delete adaptedMovie.isInWatchList;
     delete adaptedMovie.isWatched;
     delete adaptedMovie.isFavourite;
+    delete adaptedMovie.ageRating;
     delete adaptedMovie.details;
     delete adaptedMovie['watching_date'];
 

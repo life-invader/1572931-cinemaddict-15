@@ -5,7 +5,8 @@ const createFilmDetailsTemplate = (movie, data) => {
   const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details} = movie;
   const {isEmoji = false, newCommentEmojiPath = null, emoji} = data;
 
-  const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
+  // const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate.format('DD MMMM YYYY');
+  const formatMovieReleaseDate = (movieReleaseDate) => movieReleaseDate;
 
   const renderDetailsGenre = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
 

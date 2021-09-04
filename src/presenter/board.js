@@ -2,6 +2,7 @@ import BoardView from '../view/board.js'; // Поле с фильмами
 import FilmListView from '../view/film-list.js'; // главный контейнер для карточек фильмов и кнопки
 import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на случай отсутсвия фильмов
 import SortView from '../view/sort.js';
+import LoadingView from '../view/loading.js';
 // import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
 import UserStatisticsView from '../view/user-statistics.js'; // Кнопка показать еще
@@ -20,15 +21,16 @@ class Board {
     this._filterModel = filterModel;
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
     this._currentSort = SORT_BUTTONS.default;
+    this._isLoading = true;
     this._moviePresenterMap = new Map();
 
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
     this._userStatisticsComponent = new UserStatisticsView();
-
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
     this._noMoviesComponent = new EmptyFilmListView();
+    // this._loadingComponent = new LoadingView();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -82,6 +84,7 @@ class Board {
 
   _renderSort() {
     if(this._sortComponent !== null) {
+      remove(this._sortComponent);
       this._sortComponent = null;
     }
 
@@ -110,7 +113,12 @@ class Board {
 
   _renderNoMovies() {
     this._noMoviesComponent = new EmptyFilmListView(this._filterType);
-    render(this._boardComponent, this._noMoviesComponent, RenderPosition.BEFOREEND);
+    render(mainElement, this._noMoviesComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderLoading() {
+    this._loadingComponent = new LoadingView();
+    render(mainElement, this._loadingComponent, RenderPosition.BEFOREEND);
   }
 
   _handleShowMoreButtonClick() {
@@ -181,6 +189,11 @@ class Board {
         this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
         this._renderBoard();
         break;
+      case UPDATE_TYPE.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderBoard();
+        break;
     }
   }
 
@@ -191,6 +204,7 @@ class Board {
     this._moviePresenterMap.clear();
 
     remove(this._sortComponent);
+    remove(this._loadingComponent);
     remove(this._showMoreButtonComponent);
 
     if(this._noMoviesComponent) {
@@ -213,17 +227,24 @@ class Board {
   }
 
   _renderBoard() {
+    if(this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
+    remove(this._loadingComponent);
+
     const movies = this._getMovies();
     const moviesCount = movies.length;
-
-    this._renderSort();
-    render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
-    render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
 
     if(moviesCount === 0) {
       this._renderNoMovies();
       return;
     }
+
+    this._renderSort();
+    render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
+    render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
 
     this._renderMovieCards(movies.slice(0, Math.min(moviesCount, this._renderedMoviesCount)));
 
