@@ -13,6 +13,7 @@ class Movie {
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
+    this._commentsToShow = null;
 
     this._handleOpenMovieDetails = this._handleOpenMovieDetails.bind(this);
     this._handleCloseMovieDetailsPopup = this._handleCloseMovieDetailsPopup.bind(this);
@@ -88,6 +89,16 @@ class Movie {
     this._handleCloseMovieDetailsPopup();
   }
 
+  _getComments(movieId) {
+    return fetch(`https://15.ecmascript.pages.academy/cinemaddict/comments/${movieId}`, {
+      headers: {
+        'Authorization': 'Basic kgji4783jcfigdf',
+      },
+    })
+      .then((response) => response.json())
+      .then((comments) => this._commentsToShow = comments);
+  }
+
   _onEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       if (evt.target.tagName === 'INPUT' || evt.target.tagName === 'TEXTAREA') {
@@ -107,7 +118,9 @@ class Movie {
 
   _renderMovieDetails() {
     document.addEventListener('keydown', this._onEscKeyDown);
+    this._getComments(this._movie.id);
     render(this._movieDetailsContainer, this._movieDetailsComponent, RenderPosition.BEFOREEND);
+    console.log(this._movieDetailsComponent);
   }
 
   _handleOpenMovieDetails() {

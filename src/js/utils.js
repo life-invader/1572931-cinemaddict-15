@@ -127,12 +127,3 @@ const sortByDate = (firstMovie, secondMovie) => dayjs(secondMovie.details.releas
 const sortByrating = (firstMovie, secondMovie) => secondMovie.rating - firstMovie.rating;
 
 export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, replace, sortByDate, sortByrating, SORT_BUTTONS, USER_ACTION, UPDATE_TYPE, FILTER_TYPE, filter};
-
-
-import objectSupport from 'dayjs/plugin/objectSupport';
-import duration from 'dayjs/plugin/duration';
-dayjs.extend(objectSupport);
-dayjs.extend(duration);
-console.log(dayjs.duration({minutes: 70}));
-console.log( dayjs().startOf('day').add(70, 'minute').format('H[h] mm[m]'));
-// console.log(dayjs.duration(740).format('H:MM'));

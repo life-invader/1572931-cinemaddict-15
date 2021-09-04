@@ -3,7 +3,7 @@ import he from 'he';
 import dayjs from 'dayjs';
 
 const createFilmDetailsTemplate = (movie, data) => {
-  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details} = movie;
+  const {name, rating, duration, description, comments, poster, isInWatchList, isWatched, isFavourite, details, ageRating} = movie;
   const {isEmoji = false, newCommentEmojiPath = null, emoji} = data;
 
   const formatMovieReleaseDate = (movieReleaseDate) => dayjs(movieReleaseDate).format('DD MMMM YYYY');
@@ -37,7 +37,7 @@ const createFilmDetailsTemplate = (movie, data) => {
                   <div class="film-details__poster">
                     <img class="film-details__poster-img" src="${poster}" alt="">
 
-                    <p class="film-details__age">18+</p>
+                    <p class="film-details__age">${ageRating}+</p>
                   </div>
 
                   <div class="film-details__info">
@@ -170,7 +170,8 @@ class MovieDetails extends SmartView {
 
   reset(movie) {
     this._movie = movie;
-    this.updateData({newCommentEmojiPath: null, isEmoji: false, commentMessage: null, scrollTop: null, emoji: null});
+    this.updateData({newCommentEmojiPath: null, isEmoji: false, commentMessage: null, emoji: null});
+    this.getElement().scrollTop = this._data.scrollTop;
   }
 
   _toggleCommentEmojiHandler(evt) {
@@ -258,6 +259,7 @@ class MovieDetails extends SmartView {
     }
 
     evt.preventDefault();
+    this.updateData({scrollTop: this.getElement().scrollTop}, true);
     this._callback.deleteComment(evt.currentTarget.id);
   }
 
