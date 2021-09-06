@@ -41,16 +41,17 @@ class Api {
       .then((comments) => comments);
   }
 
-  // addComment(movie) {
-  //   return this._load({
-  //     url: `comments/${movie.id}`,
-  //     method: Method.POST,
-  //     body: JSON.stringify(MovieModel.adaptToServer(movie)),
-  //     headers: new Headers({'Content-Type': 'application/json'}),
-  //   })
-  //     .then(Api.toJSON)
-  //     .then(MovieModel.adaptToClient);
-  // }
+  addComment(comment) {
+    return this._load({
+      url: `comments/${comment.movieId}`,
+      method: Method.POST,
+      body: JSON.stringify(MovieModel.adaptCommentToServer(comment)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.toJSON)
+      .then(MovieModel.adaptCommentToClient)
+      .catch(() => {throw new Error('Ошибка добавления комментария')});
+  }
 
   _load({
     url,

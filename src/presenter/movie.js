@@ -14,6 +14,7 @@ class Movie {
 
     this._movieComponent = null;
     this._movieDetailsComponent = null;
+    this._comments = null;
 
     this._handleOpenMovieDetails = this._handleOpenMovieDetails.bind(this);
     this._handleCloseMovieDetailsPopup = this._handleCloseMovieDetailsPopup.bind(this);
@@ -61,6 +62,13 @@ class Movie {
 
     if(this._movieDetailsContainer.contains(prevMovieDetailsComponent.getElement())) {
       replace(this._movieDetailsComponent, prevMovieDetailsComponent);
+      if(this.isPopupOpened) {
+        this._api.getComments(this._movie.id)
+          .then((comments) => {
+            this._comments = comments;
+            this._movieDetailsComponent.setComments(comments);
+          });
+      }
       this._movieDetailsComponent.getElement().scrollTop = this._movieDetailsComponent.data.scrollTop; // Не работает, не скролит до нужного места
     }
 
@@ -144,15 +152,12 @@ class Movie {
 
   _handleAddNewComment(text, emotion) {
     const newComment = {
-      id: nanoid(),
-      text: text,
+      comment: text,
       emotion: emotion,
-      author: getRandomArrayProperty(COMMENT_AUTHOR),
-      date: generateCommentDate(),
+      movieId: this._movie.id,
     };
 
-    this._movie.comments.push(newComment);
-    this._updateData(USER_ACTION.ADD_COMMENT, this._movie, UPDATE_TYPE.PATCH);
+    this._updateData(USER_ACTION.ADD_COMMENT, newComment, UPDATE_TYPE.PATCH);
     this._movieDetailsComponent.reset(this._movie);
   }
 

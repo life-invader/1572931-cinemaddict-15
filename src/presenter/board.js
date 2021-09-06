@@ -150,10 +150,14 @@ class Board {
   _handleViewAction(actionType, updateMovie, updateType) {
     switch (actionType) {
       case USER_ACTION.UPDATE_MOVIE:
-        this._api.updateMovie(updateMovie).then((response) => this._movieModel.updateMovie(updateType, response));
+        this._api.updateMovie(updateMovie)
+          .then((response) => this._movieModel.updateMovie(updateType, response));
         break;
       case USER_ACTION.ADD_COMMENT:
-        this._movieModel.addComment(updateType, updateMovie);
+        this._api.addComment(updateMovie)
+          .then((response) => this._movieModel.addComment(updateType, response))
+          .catch(() => {throw new Error('Ошибка добавления коментария');});
+        // this._movieModel.addComment(updateType, updateMovie);
         break;
       case USER_ACTION.DELETE_COMMENT:
         this._movieModel.deleteComment(updateType, updateMovie);

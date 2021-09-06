@@ -20,8 +20,8 @@ const renderChart = (statisticCtx, data) => {
   const BAR_HEIGHT = 50;
 
   const watchedMovies = data.filter((movie) => movie.isWatched);
-  const genres = [...new Set(watchedMovies.map((movie) => movie.genre))];
-  const amount = genres.map((genre) => watchedMovies.filter((movie) => movie.genre === genre).length);
+  const genres = [...new Set(watchedMovies.map((movie) => movie['details'].genres[0]))];
+  const amount = genres.map((genre) => watchedMovies.filter((movie) => movie['details'].genres[0] === genre).length);
 
   // Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
   statisticCtx.height = BAR_HEIGHT * genres.length;
@@ -95,7 +95,7 @@ const createUserStatisticsTemplate = (data) => {
     totalDuration = movieDuration.reduce((accumulator, movie) => accumulator + movie);
   }
 
-  const genres = data.map((movie) => movie.genre);
+  const genres = data.map((movie) => movie['details'].genres[0]);
   let topGenre;
 
   //=============================================

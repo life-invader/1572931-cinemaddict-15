@@ -36,6 +36,21 @@ class Movies extends AbstractObserver {
     this._notify(updateType, updateMovie);
   }
 
+  static adaptCommentToServer(comment) {
+    // Ненужные ключи мы удаляем
+    delete comment.movieId;
+
+    return comment;
+  }
+
+  static adaptCommentToClient(comment) {
+    // Ненужные ключи мы удаляем
+    const {movie} = comment;
+    // delete comment['comments'];
+
+    return Movies.adaptToClient(movie);
+  }
+
   static adaptToClient(movie) {
     const adaptedMovie = Object.assign(
       {},
