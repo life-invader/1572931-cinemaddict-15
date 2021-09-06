@@ -157,10 +157,11 @@ class Board {
         this._api.addComment(updateMovie)
           .then((response) => this._movieModel.addComment(updateType, response))
           .catch(() => {throw new Error('Ошибка добавления коментария');});
-        // this._movieModel.addComment(updateType, updateMovie);
         break;
       case USER_ACTION.DELETE_COMMENT:
-        this._movieModel.deleteComment(updateType, updateMovie);
+        this._api.deleteComment(updateMovie)
+          .then(() => this._movieModel.deleteComment(updateType, updateMovie))
+          .catch(() => {throw new Error('Ошибка удаления коментария');});
         break;
     }
   }

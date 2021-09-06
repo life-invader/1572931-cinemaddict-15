@@ -50,7 +50,17 @@ class Api {
     })
       .then(Api.toJSON)
       .then(MovieModel.adaptCommentToClient)
-      .catch(() => {throw new Error('Ошибка добавления комментария')});
+      .catch(() => {throw new Error('Ошибка добавления комментария');});
+  }
+
+  deleteComment(commentToDelete) {
+    return this._load({
+      url: `comments/${commentToDelete.commentId}`,
+      method: Method.DELETE,
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then((response) => response)
+      .catch(() => {throw new Error('Ошибка удаления комментария');});
   }
 
   _load({

@@ -2,9 +2,6 @@ import MovieCardView from '../view/movie-card.js'; // Карточка филь�
 import MovieDetailsView from '../view/film-details.js'; // Показ подробной информации о фильме
 import {render, RenderPosition, remove, replace, USER_ACTION, UPDATE_TYPE} from '../js/utils.js';
 
-import {nanoid} from 'nanoid';
-import {getRandomArrayProperty, COMMENT_AUTHOR, generateCommentDate} from '../mock/movie.js';
-
 class Movie {
   constructor(movieListContainer, updateData, changeMode, api) {
     this._movieListContainer = movieListContainer;
@@ -144,10 +141,12 @@ class Movie {
   }
 
   _handleCommentDeleteClick(commentId) {
-    const index = this._movie.comments.findIndex((comment) => comment.id === commentId);
-    this._movie.comments = [...this._movie.comments.slice(0, index), ...this._movie.comments.slice(index + 1)];
+    const commentToDelete = {
+      commentId: commentId,
+      movieId: this._movie.id,
+    };
 
-    this._updateData(USER_ACTION.DELETE_COMMENT, this._movie, UPDATE_TYPE.PATCH);
+    this._updateData(USER_ACTION.DELETE_COMMENT, commentToDelete, UPDATE_TYPE.PATCH);
   }
 
   _handleAddNewComment(text, emotion) {

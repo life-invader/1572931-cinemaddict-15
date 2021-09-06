@@ -30,10 +30,13 @@ class Movies extends AbstractObserver {
   }
 
   deleteComment(updateType, updateMovie) {
-    const index = this._movies.findIndex((item) => item.id === updateMovie.id);
-    this._movies = [...this._movies.slice(0, index), updateMovie, ...this._movies.slice(index + 1)];
+    const movieIndex = this._movies.findIndex((item) => item.id === updateMovie.movieId);
+    const movie = this._movies.find((item) => item.id === updateMovie.movieId);
+    const commentIndex = movie.comments.findIndex((item) => item === updateMovie.commentId);
+    movie.comments = [...movie.comments.slice(0, commentIndex), ...movie.comments.slice(commentIndex + 1)];
+    this._movies = [...this._movies.slice(0, movieIndex), movie, ...this._movies.slice(movieIndex + 1)];
 
-    this._notify(updateType, updateMovie);
+    this._notify(updateType, movie);
   }
 
   static adaptCommentToServer(comment) {
