@@ -5,9 +5,11 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 const createFilmDetailsTemplate = (movie, data, comments) => {
   const {name, rating, duration, description, poster, isInWatchList, isWatched, isFavourite, details, ageRating} = movie;
-  const {isEmoji = false, newCommentEmojiPath = null, emoji} = data;
+  const {isEmoji = false, newCommentEmojiPath = null, emoji, isDisabled, deletingCommentId} = data;
 
   const formatMovieReleaseDate = (movieReleaseDate) => dayjs(movieReleaseDate).format('DD MMMM YYYY');
   const formatDuration = (movieDuration) => dayjs().startOf('day').add(movieDuration, 'minute').format('H[h] mm[m]');
@@ -26,7 +28,7 @@ const createFilmDetailsTemplate = (movie, data, comments) => {
           <p class="film-details__comment-info">
             <span class="film-details__comment-author">${comment.author}</span>
             <span class="film-details__comment-day">${formatCommentDate(comment.date)}</span>
-            <button class="film-details__comment-delete">Delete</button>
+            <button class="film-details__comment-delete" ${isDisabled ? 'disabled' : ''}>${deletingCommentId === comment.id ? 'Deleting...' : 'Delete'}</button>
           </p>
         </div>
       </li>`)).join('');
@@ -114,26 +116,26 @@ const createFilmDetailsTemplate = (movie, data, comments) => {
                     <div class="film-details__add-emoji-label">${isEmoji ? `<img src=${newCommentEmojiPath} width="55" height="55" alt="emoji-smile">` : ''}</div>
 
                     <label class="film-details__comment-label">
-                      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? 'disabled' : ''}></textarea>
                     </label>
 
                     <div class="film-details__emoji-list">
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile ${emoji === 'smile' ? 'checked' : ''}">
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" ${isDisabled ? 'disabled' : ''} id="emoji-smile" value="smile ${emoji === 'smile' ? 'checked' : ''}">
                       <label class="film-details__emoji-label" for="emoji-smile">
                         <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
                       </label>
 
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${emoji === 'sleeping' ? 'checked' : ''}>
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" ${isDisabled ? 'disabled' : ''} id="emoji-sleeping" value="sleeping" ${emoji === 'sleeping' ? 'checked' : ''}>
                       <label class="film-details__emoji-label" for="emoji-sleeping">
                         <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
                       </label>
 
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${emoji === 'puke' ? 'checked' : ''}>
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" ${isDisabled ? 'disabled' : ''} id="emoji-puke" value="puke" ${emoji === 'puke' ? 'checked' : ''}>
                       <label class="film-details__emoji-label" for="emoji-puke">
                         <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
                       </label>
 
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${emoji === 'angry' ? 'checked' : ''}>
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" ${isDisabled ? 'disabled' : ''} id="emoji-angry" value="angry" ${emoji === 'angry' ? 'checked' : ''}>
                       <label class="film-details__emoji-label" for="emoji-angry">
                         <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
                       </label>
@@ -169,6 +171,14 @@ class MovieDetails extends SmartView {
     }
   }
 
+  shake(callback) {
+    this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => {
+      this.getElement().style.animation = '';
+      callback();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
   getTemplate() {
     return createFilmDetailsTemplate(this._movie, this._data, this._comments);
   }
@@ -181,7 +191,7 @@ class MovieDetails extends SmartView {
   reset(movie) {
     this._movie = movie;
     this.updateData({newCommentEmojiPath: null, isEmoji: false, commentMessage: null, emoji: null});
-    this.getElement().scrollTop = this._data.scrollTop;
+    // this.getElement().scrollTop = this._data.scrollTop;
   }
 
   _toggleCommentEmojiHandler(evt) {
@@ -267,7 +277,7 @@ class MovieDetails extends SmartView {
     }
 
     evt.preventDefault();
-    this.updateData({scrollTop: this.getElement().scrollTop}, true);
+    this.updateData({scrollTop: this.getElement().scrollTop, deletingCommentId: evt.currentTarget.id});
     this._callback.deleteComment(evt.currentTarget.id);
   }
 

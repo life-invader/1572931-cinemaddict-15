@@ -47,9 +47,7 @@ class Movies extends AbstractObserver {
   }
 
   static adaptCommentToClient(comment) {
-    // Ненужные ключи мы удаляем
     const {movie} = comment;
-    // delete comment['comments'];
 
     return Movies.adaptToClient(movie);
   }

@@ -7,7 +7,7 @@ import LoadingView from '../view/loading.js';
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
 import UserStatisticsView from '../view/user-statistics.js'; // Кнопка показать еще
 import {render, RenderPosition, remove, sortByDate, sortByrating, SORT_BUTTONS, UPDATE_TYPE, USER_ACTION, filter} from '../js/utils.js';
-import MoviePresenter from './movie.js';
+import MoviePresenter, {State} from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
 // const MOVIE_CARD_COUNT_EXTRA = 2;
@@ -155,14 +155,22 @@ class Board {
           .catch(() => {throw new Error('Ошибка рбновления карточки фильма');});
         break;
       case USER_ACTION.ADD_COMMENT:
+        this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
         this._api.addComment(updatedData)
           .then((response) => this._movieModel.addComment(updateType, response))
-          .catch(() => {throw new Error('Ошибка добавления коментария');});
+          .catch(() => {
+            this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING);
+            throw new Error('Ошибка добавления коментария');
+          });
         break;
       case USER_ACTION.DELETE_COMMENT:
+        this._moviePresenterMap.get(updatedData.movieId).setViewState(State.DELETING);
         this._api.deleteComment(updatedData)
           .then(() => this._movieModel.deleteComment(updateType, updatedData))
-          .catch(() => {throw new Error('Ошибка удаления коментария');});
+          .catch(() => {
+            this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING);
+            throw new Error('Ошибка удаления коментария');
+          });
         break;
     }
   }

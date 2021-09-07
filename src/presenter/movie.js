@@ -2,6 +2,12 @@ import MovieCardView from '../view/movie-card.js'; // Карточка филь�
 import MovieDetailsView from '../view/film-details.js'; // Показ подробной информации о фильме
 import {render, RenderPosition, remove, replace, USER_ACTION, UPDATE_TYPE} from '../js/utils.js';
 
+export const State = {
+  ADDING: 'ADDING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
 class Movie {
   constructor(movieListContainer, updateData, changeMode, api) {
     this._movieListContainer = movieListContainer;
@@ -73,7 +79,21 @@ class Movie {
     // remove(prevMovieComponent);
   }
 
-  // ====================================================================================
+  setViewState(state) {
+    switch (state) {
+      case State.ADDING:
+        this._movieDetailsComponent.updateData({isDisabled: true});
+        break;
+      case State.DELETING:
+        this._movieDetailsComponent.updateData({isDisabled: true});
+        break;
+      case State.ABORTING:
+        // this._movieDetailsComponent.updateData({isDisabled: false});
+        this._movieDetailsComponent.shake(() => this._movieDetailsComponent.updateData({isDisabled: false}));
+        break;
+    }
+  }
+
 
   isPopupOpened() {
     return this._movieDetailsContainer.contains(this._movieDetailsComponent.getElement());
@@ -147,6 +167,8 @@ class Movie {
     };
 
     this._updateData(USER_ACTION.DELETE_COMMENT, commentToDelete, UPDATE_TYPE.PATCH);
+    // this._movieDetailsComponent.reset(this._movie);
+    this._movieDetailsComponent.updateData({isDisabled: false}, true);
   }
 
   _handleAddNewComment(text, emotion) {
@@ -157,6 +179,7 @@ class Movie {
     };
 
     this._updateData(USER_ACTION.ADD_COMMENT, newComment, UPDATE_TYPE.PATCH);
+    this._movieDetailsComponent.updateData({isDisabled: false}, true);
     this._movieDetailsComponent.reset(this._movie);
   }
 
