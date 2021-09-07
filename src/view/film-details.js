@@ -82,7 +82,7 @@ const createFilmDetailsTemplate = (movie, data, comments) => {
                         <td class="film-details__cell">${details.country}</td>
                       </tr>
                       <tr class="film-details__row">
-                        <td class="film-details__term">Genres</td>
+                        <td class="film-details__term">${details.genres.length > 1 ? 'Genres' : 'Genre'}</td>
                         <td class="film-details__cell">${renderDetailsGenre(details.genres)}</td>
                       </tr>
                     </table>
@@ -260,8 +260,6 @@ class MovieDetails extends SmartView {
     this._callback.markAsWatchedDetailsButtonClick = callback;
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._markAsWatchedDetailsButtonClick);
   }
-
-  // ==================================================================================================================================================================================
 
   _commentDeleteClickHandler(evt) {
     if(evt.target.tagName !== 'BUTTON') {

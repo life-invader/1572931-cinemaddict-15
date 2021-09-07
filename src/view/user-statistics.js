@@ -151,11 +151,11 @@ const createUserStatisticsTemplate = (data) => {
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">${(totalDuration / 60).toFixed()} <span class="statistic__item-description">h</span> ${(totalDuration % 60).toFixed()} <span class="statistic__item-description">m</span></p>
+        <p class="statistic__item-text">${totalDuration ? (totalDuration / 60).toFixed(): 0} <span class="statistic__item-description">h</span> ${totalDuration ? (totalDuration % 60).toFixed() : 0} <span class="statistic__item-description">m</span></p>
       </li>
       <li class="statistic__text-item">
-        <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">${topGenre}</p>
+        ${topGenre ? `<h4 class="statistic__item-title">Top genre</h4>
+        <p class="statistic__item-text">${topGenre}</p>` : ''}
       </li>
     </ul>
 

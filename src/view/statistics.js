@@ -1,10 +1,30 @@
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
 
-const createStatisticsTemplate = () => '<p>130 291 movies inside</p>';
+const createStatisticsTemplate = (moviesAmount = 0) => `<p>${moviesAmount} movies inside</p>`;
 
-class Statistics extends AbstractView {
+class Statistics extends SmartView {
+  constructor(movieModel) {
+    super();
+
+    this._movieModel = movieModel;
+    this._moviesAmount = null;
+
+    this._getMoviesAmount = this._getMoviesAmount.bind(this);
+    this._movieModel.addObserver(this._getMoviesAmount);
+  }
+
+  _getMoviesAmount() {
+    this._moviesAmount = this._movieModel.getMovies().length;
+    this.updateData({});
+    this._movieModel.removeObserver(this._getMoviesAmount);
+  }
+
   getTemplate() {
-    return createStatisticsTemplate();
+    return createStatisticsTemplate(this._moviesAmount);
+  }
+
+  restoreHandlers() {
+    console.log('Hello from statistics View'); // Этот метод не нужен, но тогда ругается Smart компонент!
   }
 }
 

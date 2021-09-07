@@ -147,40 +147,41 @@ class Board {
 
   }
 
-  _handleViewAction(actionType, updateMovie, updateType) {
+  _handleViewAction(actionType, updatedData, updateType) {
     switch (actionType) {
       case USER_ACTION.UPDATE_MOVIE:
-        this._api.updateMovie(updateMovie)
-          .then((response) => this._movieModel.updateMovie(updateType, response));
+        this._api.updateMovie(updatedData)
+          .then((response) => this._movieModel.updateMovie(updateType, response))
+          .catch(() => {throw new Error('Ошибка рбновления карточки фильма');});
         break;
       case USER_ACTION.ADD_COMMENT:
-        this._api.addComment(updateMovie)
+        this._api.addComment(updatedData)
           .then((response) => this._movieModel.addComment(updateType, response))
           .catch(() => {throw new Error('Ошибка добавления коментария');});
         break;
       case USER_ACTION.DELETE_COMMENT:
-        this._api.deleteComment(updateMovie)
-          .then(() => this._movieModel.deleteComment(updateType, updateMovie))
+        this._api.deleteComment(updatedData)
+          .then(() => this._movieModel.deleteComment(updateType, updatedData))
           .catch(() => {throw new Error('Ошибка удаления коментария');});
         break;
     }
   }
 
-  _handleModelEvent(updateType, updateMovie) {
+  _handleModelEvent(updateType, updatedData) {
     switch (updateType) {
       case UPDATE_TYPE.PATCH:
-        this._moviePresenterMap.get(updateMovie.id).init(updateMovie);
+        this._moviePresenterMap.get(updatedData.id).init(updatedData);
         break;
       case UPDATE_TYPE.MINOR: {
-        const isPopupOpened = this._moviePresenterMap.get(updateMovie.id).isPopupOpened();
+        const isPopupOpened = this._moviePresenterMap.get(updatedData.id).isPopupOpened();
         this._clearBoard();
         this._renderBoard();
 
-        let moviePresenter = this._moviePresenterMap.get(updateMovie.id);
+        let moviePresenter = this._moviePresenterMap.get(updatedData.id);
         if(!moviePresenter){
           moviePresenter = new MoviePresenter(null, this._handleViewAction, this._handleModechange, this._api);
-          moviePresenter.init(updateMovie);
-          this._moviePresenterMap.set(updateMovie.id, moviePresenter);
+          moviePresenter.init(updatedData);
+          this._moviePresenterMap.set(updatedData.id, moviePresenter);
         }
         if (moviePresenter && isPopupOpened) {
           moviePresenter.openPopup();
