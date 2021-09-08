@@ -148,6 +148,7 @@ class Board {
   }
 
   _handleViewAction(actionType, updatedData, updateType) {
+    const newData = Object.assign({}, updatedData);
     switch (actionType) {
       case USER_ACTION.UPDATE_MOVIE:
         this._api.updateMovie(updatedData)
@@ -157,9 +158,11 @@ class Board {
       case USER_ACTION.ADD_COMMENT:
         this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
         this._api.addComment(updatedData)
-          .then((response) => this._movieModel.addComment(updateType, response))
+          .then((response) => {
+            this._movieModel.addComment(updateType, response);
+          })
           .catch(() => {
-            this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING);
+            this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
             throw new Error('Ошибка добавления коментария');
           });
         break;
@@ -168,7 +171,7 @@ class Board {
         this._api.deleteComment(updatedData)
           .then(() => this._movieModel.deleteComment(updateType, updatedData))
           .catch(() => {
-            this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING);
+            this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING_DELETING);
             throw new Error('Ошибка удаления коментария');
           });
         break;

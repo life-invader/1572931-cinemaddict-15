@@ -5,7 +5,8 @@ import {render, RenderPosition, remove, replace, USER_ACTION, UPDATE_TYPE} from 
 export const State = {
   ADDING: 'ADDING',
   DELETING: 'DELETING',
-  ABORTING: 'ABORTING',
+  ABORTING_DELETING: 'ABORTING_DELETING',
+  ABORTING_ADDING: 'ABORTING_ADDING',
 };
 
 class Movie {
@@ -82,14 +83,16 @@ class Movie {
   setViewState(state) {
     switch (state) {
       case State.ADDING:
-        this._movieDetailsComponent.updateData({isDisabled: true});
+        this._movieDetailsComponent.updateData({isAdding: true});
         break;
       case State.DELETING:
-        this._movieDetailsComponent.updateData({isDisabled: true});
+        this._movieDetailsComponent.updateData({isDeleting: true});
         break;
-      case State.ABORTING:
-        // this._movieDetailsComponent.updateData({isDisabled: false});
-        this._movieDetailsComponent.shake(() => this._movieDetailsComponent.updateData({isDisabled: false}));
+      case State.ABORTING_DELETING:
+        this._movieDetailsComponent.shakeComment(() => this._movieDetailsComponent.updateData({isDeleting: false}));
+        break;
+      case State.ABORTING_ADDING:
+        this._movieDetailsComponent.shake(() => this._movieDetailsComponent.updateData({isAdding: false}));
         break;
     }
   }
@@ -168,7 +171,7 @@ class Movie {
 
     this._updateData(USER_ACTION.DELETE_COMMENT, commentToDelete, UPDATE_TYPE.PATCH);
     // this._movieDetailsComponent.reset(this._movie);
-    this._movieDetailsComponent.updateData({isDisabled: false}, true);
+    this._movieDetailsComponent.updateData({isDeleting: false}, true);
   }
 
   _handleAddNewComment(text, emotion) {
@@ -179,10 +182,8 @@ class Movie {
     };
 
     this._updateData(USER_ACTION.ADD_COMMENT, newComment, UPDATE_TYPE.PATCH);
-    this._movieDetailsComponent.updateData({isDisabled: false}, true);
-    this._movieDetailsComponent.reset(this._movie);
+    this._movieDetailsComponent.updateData({isAdding: false});
   }
-
 }
 
 export default Movie;
