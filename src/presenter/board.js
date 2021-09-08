@@ -3,14 +3,12 @@ import FilmListView from '../view/film-list.js'; // главный контей�
 import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на случай отсутсвия фильмов
 import SortView from '../view/sort.js';
 import LoadingView from '../view/loading.js';
-// import MovieListExtra from './view/film-list-extra.js'; // Поле для 2-х экстра блоков
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
 import UserStatisticsView from '../view/user-statistics.js'; // Кнопка показать еще
 import {render, RenderPosition, remove, sortByDate, sortByrating, SORT_BUTTONS, UPDATE_TYPE, USER_ACTION, filter} from '../js/utils.js';
 import MoviePresenter, {State} from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
-// const MOVIE_CARD_COUNT_EXTRA = 2;
 
 const mainElement = document.querySelector('.main');
 
@@ -31,7 +29,6 @@ class Board {
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
     this._noMoviesComponent = new EmptyFilmListView();
-    // this._loadingComponent = new LoadingView();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
