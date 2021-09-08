@@ -16,8 +16,6 @@ const createFilmDetailsTemplate = (movie, data, comments) => {
   const renderDetailsGenre = (genres) => genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join('');
   const formatCommentDate = (date) => dayjs(date).fromNow();
 
-  // const
-
   const renderDetailsComment = (commentsList) => commentsList.map((comment) =>
     (`<li class="film-details__comment" id='${comment.id}'>
         <span class="film-details__comment-emoji">

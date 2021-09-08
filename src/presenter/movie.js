@@ -75,9 +75,6 @@ class Movie {
       }
       this._movieDetailsComponent.getElement().scrollTop = this._movieDetailsComponent.data.scrollTop; // Не работает, не скролит до нужного места
     }
-
-    // Зачем это нужно, хз. Взял из демо проекта. И без этой строки все работает
-    // remove(prevMovieComponent);
   }
 
   setViewState(state) {
@@ -105,8 +102,6 @@ class Movie {
   openPopup() {
     this._handleOpenMovieDetails();
   }
-
-  // ====================================================================================
 
   destroy() {
     remove(this._movieComponent);
@@ -170,7 +165,6 @@ class Movie {
     };
 
     this._updateData(USER_ACTION.DELETE_COMMENT, commentToDelete, UPDATE_TYPE.PATCH);
-    // this._movieDetailsComponent.reset(this._movie);
     this._movieDetailsComponent.updateData({isDeleting: false}, true);
   }
 

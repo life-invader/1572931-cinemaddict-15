@@ -94,16 +94,6 @@ const randomFloat = (a = 10, b = 1) => {
   return String(number).endsWith('0') ? Number(number).toFixed() : Number(number).toFixed(1);
 };
 
-// const updateItem = (items, newitem) => {
-//   const index = items.findIndex((item) => item.id === newitem.id);
-
-//   if(index === -1) {
-//     return items;
-//   }
-
-//   return [...items.slice(0, index), newitem, ...items.slice(index + 1)];
-// };
-
 const replace = (newChild, oldChild) => {
   if (oldChild instanceof Abstract) {
     oldChild = oldChild.getElement();

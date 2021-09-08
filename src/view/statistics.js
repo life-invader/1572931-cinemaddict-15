@@ -24,7 +24,7 @@ class Statistics extends SmartView {
   }
 
   restoreHandlers() {
-    console.log('Hello from statistics View'); // Этот метод не нужен, но тогда ругается Smart компонент!
+  // Этот метод не нужен, но тогда ругается Smart компонент!
   }
 }
 

@@ -40,7 +40,6 @@ class Movies extends AbstractObserver {
   }
 
   static adaptCommentToServer(comment) {
-    // Ненужные ключи мы удаляем
     delete comment.movieId;
 
     return comment;
