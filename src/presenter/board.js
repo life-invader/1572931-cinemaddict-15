@@ -6,7 +6,7 @@ import LoadingView from '../view/loading.js';
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
 import UserStatisticsView from '../view/user-statistics.js'; // Статистика пользователя
 import {render, RenderPosition, remove, sortByDate, sortByrating} from '../js/utils.js';
-import {SortButtons, UpdateType, UserAction, filter} from '../js/const.js';
+import {SortButton, UpdateType, UserAction, Filter} from '../js/const.js';
 import MoviePresenter, {State} from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
@@ -19,7 +19,7 @@ class Board {
     this._movieModel = movieModel;
     this._filterModel = filterModel;
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
-    this._currentSort = SortButtons.default;
+    this._currentSort = SortButton.DEFAULT;
     this._isLoading = true;
     this._api = api;
     this._moviePresenterMap = new Map();
@@ -55,12 +55,12 @@ class Board {
   _getMovies() {
     this._filterType = this._filterModel.getFilter();
     const movies = this._movieModel.getMovies();
-    const filteredMovies = filter[this._filterType](movies);
+    const filteredMovies = Filter[this._filterType](movies);
 
     switch (this._currentSort) {
-      case SortButtons.byDate:
+      case SortButton.BY_DATE:
         return filteredMovies.sort(sortByDate);
-      case SortButtons.byRating:
+      case SortButton.BY_RATING:
         return filteredMovies.sort(sortByrating);
     }
     return filteredMovies;
@@ -231,7 +231,7 @@ class Board {
     }
 
     if (resetSortType) {
-      this._currentSort = SortButtons.default;
+      this._currentSort = SortButton.DEFAULT;
     }
   }
 

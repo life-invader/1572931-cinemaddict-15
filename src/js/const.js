@@ -1,17 +1,17 @@
 const FilterType = {
-  all: 'all',
-  watchlist: 'watchlist',
-  history: 'history',
-  favourites: 'favourites',
-  statistics: 'statistics',
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVOURITE: 'favourites',
+  STATISTIC: 'statistics',
 };
 
-const filter = {
-  [FilterType.all]: (movies) => movies.slice(),
-  [FilterType.watchlist]: (movies) => movies.filter((movie) => movie.isInWatchList === true),
-  [FilterType.history]: (movies) => movies.filter((movie) => movie.isWatched === true),
-  [FilterType.favourites]: (movies) => movies.filter((movie) => movie.isFavourite === true),
-  [FilterType.statistics]: (movies) => movies.slice(),
+const Filter = {
+  [FilterType.ALL]: (movies) => movies.slice(),
+  [FilterType.WATCHLIST]: (movies) => movies.filter((movie) => movie.isInWatchList === true),
+  [FilterType.HISTORY]: (movies) => movies.filter((movie) => movie.isWatched === true),
+  [FilterType.FAVOURITE]: (movies) => movies.filter((movie) => movie.isFavourite === true),
+  [FilterType.STATISTIC]: (movies) => movies.slice(),
 };
 
 const UpdateType = {
@@ -21,11 +21,11 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-const SortButtons = {
-  default: 'default',
-  byDate: 'byDate',
-  byRating: 'byRating',
-  statistics: 'statistics',
+const SortButton = {
+  DEFAULT: 'default',
+  BY_DATE: 'byDate',
+  BY_RATING: 'byRating',
+  STATISTIC: 'statistics',
 };
 
 const UserAction = {
@@ -34,4 +34,4 @@ const UserAction = {
   DELETE_COMMENT: 'DELETE_COMMENT',
 };
 
-export {FilterType, filter, UpdateType, SortButtons, UserAction};
+export {FilterType, Filter, UpdateType, SortButton, UserAction};

@@ -28,13 +28,13 @@ render(headerElement, new UserProfileView(movieModel), RenderPosition.BEFOREEND)
 render(footerElement, new StatisticsView(movieModel), RenderPosition.BEFOREEND); // Статистика с кол-вом фильмов в футере
 
 const MenuItem = {
-  STATISTICS: 'statistics',
+  STATISTIC: 'statistics',
 };
 
 let userStatisticsComponent = null;
 
 const handleUserStatisticsClick = (menuItem = 'statistics') => {
-  if(menuItem !== MenuItem.STATISTICS) {
+  if(menuItem !== MenuItem.STATISTIC) {
     remove(userStatisticsComponent);
     return;
   }

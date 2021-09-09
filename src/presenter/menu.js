@@ -1,6 +1,6 @@
 import MenuTemplateView from '../view/menu.js';
 import {remove, render, RenderPosition, replace} from '../js/utils.js';
-import {UpdateType, filter, FilterType} from '../js/const.js';
+import {UpdateType, Filter, FilterType} from '../js/const.js';
 
 class MenuFilter {
   constructor(container, moviesModel, filterModel) {
@@ -44,9 +44,9 @@ class MenuFilter {
       return;
     }
 
-    if(filterType === FilterType.statistics) {
+    if(filterType === FilterType.STATISTIC) {
       this._filterModel.setFilter(UpdateType.MAJOR, filterType);
-      this._showStatistics(FilterType.statistics);
+      this._showStatistics(FilterType.STATISTIC);
       return;
     }
 
@@ -59,19 +59,19 @@ class MenuFilter {
 
     return [
       {
-        name: FilterType.watchlist,
-        count: filter[FilterType.watchlist](movies).length,
+        name: FilterType.WATCHLIST,
+        count: Filter[FilterType.WATCHLIST](movies).length,
       },
       {
-        name: FilterType.history,
-        count: filter[FilterType.history](movies).length,
+        name: FilterType.HISTORY,
+        count: Filter[FilterType.HISTORY](movies).length,
       },
       {
-        name: FilterType.favourites,
-        count: filter[FilterType.favourites](movies).length,
+        name: FilterType.FAVOURITE,
+        count: Filter[FilterType.FAVOURITE](movies).length,
       },
       {
-        name: FilterType.statistics,
+        name: FilterType.STATISTIC,
         count: null,
       },
     ];

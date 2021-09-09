@@ -4,7 +4,7 @@ import {FilterType} from '../js/const.js';
 class MenuFilter extends AbstractObserver {
   constructor() {
     super();
-    this._activeFilter = FilterType.all;
+    this._activeFilter = FilterType.ALL;
   }
 
   setFilter(updateType, filter, renderStatistics) {
