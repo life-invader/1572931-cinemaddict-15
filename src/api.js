@@ -38,7 +38,8 @@ class Api {
   getComments(movieId) {
     return this._load({url: `comments/${movieId}`})
       .then(Api.toJSON)
-      .then((comments) => comments);
+      .then((comments) => comments)
+      .catch(() => {throw new Error('Ошибка получения списка комментариев');});
   }
 
   addComment(comment) {

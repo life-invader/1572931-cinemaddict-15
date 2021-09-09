@@ -1,6 +1,7 @@
 import MovieCardView from '../view/movie-card.js'; // Карточка фильма
 import MovieDetailsView from '../view/film-details.js'; // Показ подробной информации о фильме
-import {render, RenderPosition, remove, replace, USER_ACTION, UPDATE_TYPE} from '../js/utils.js';
+import {render, RenderPosition, remove, replace} from '../js/utils.js';
+import {UserAction, UpdateType} from '../js/const.js';
 
 export const State = {
   ADDING: 'ADDING',
@@ -155,15 +156,15 @@ class Movie {
   }
 
   _handleFavouriteButtonClick() {
-    this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isFavourite: !this._movie.isFavourite}), UPDATE_TYPE.MINOR);
+    this._updateData(UserAction.UPDATE_MOVIE, Object.assign({}, this._movie, {isFavourite: !this._movie.isFavourite}), UpdateType.MINOR);
   }
 
   _handleAddToWatchlistButtonClick() {
-    this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isInWatchList: !this._movie.isInWatchList}), UPDATE_TYPE.MINOR);
+    this._updateData(UserAction.UPDATE_MOVIE, Object.assign({}, this._movie, {isInWatchList: !this._movie.isInWatchList}), UpdateType.MINOR);
   }
 
   _handleMarkAsWatchedButtonClick() {
-    this._updateData(USER_ACTION.UPDATE_MOVIE, Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}), UPDATE_TYPE.MINOR);
+    this._updateData(UserAction.UPDATE_MOVIE, Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}), UpdateType.MINOR);
   }
 
   _handleCommentDeleteClick(commentId) {
@@ -172,7 +173,7 @@ class Movie {
       movieId: this._movie.id,
     };
 
-    this._updateData(USER_ACTION.DELETE_COMMENT, commentToDelete, UPDATE_TYPE.PATCH);
+    this._updateData(UserAction.DELETE_COMMENT, commentToDelete, UpdateType.PATCH);
     this._movieDetailsComponent.updateData({isDeleting: false}, true);
   }
 
@@ -183,7 +184,7 @@ class Movie {
       movieId: this._movie.id,
     };
 
-    this._updateData(USER_ACTION.ADD_COMMENT, newComment, UPDATE_TYPE.PATCH);
+    this._updateData(UserAction.ADD_COMMENT, newComment, UpdateType.PATCH);
     this._movieDetailsComponent.updateData({isAdding: false});
   }
 }

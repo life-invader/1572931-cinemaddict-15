@@ -1,7 +1,8 @@
 import UserProfileView from './view/user-profile.js';
 import StatisticsView from './view/statistics.js';
 import UserStatisticsView from './view/user-statistics.js';
-import {render, RenderPosition, remove, UPDATE_TYPE} from './js/utils.js';
+import {render, RenderPosition, remove} from './js/utils.js';
+import {UpdateType} from './js/const.js';
 import BoardPresenter from './presenter/board.js';
 import MenuFilterPresenter from './presenter/menu.js';
 import MovieModel from './model/movie.js';
@@ -48,9 +49,9 @@ boardPresenter.init();
 
 api.getMovies()
   .then((movies) => {
-    movieModel.setMovies(UPDATE_TYPE.INIT, movies);
+    movieModel.setMovies(UpdateType.INIT, movies);
   })
   .catch(() => {
-    movieModel.setMovies(UPDATE_TYPE.INIT, []);
+    movieModel.setMovies(UpdateType.INIT, []);
     throw new Error('Ошибка');
   });

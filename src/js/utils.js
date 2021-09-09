@@ -1,42 +1,6 @@
 import dayjs from 'dayjs';
 import Abstract from '../view/abstract.js';
 
-const USER_ACTION = {
-  UPDATE_MOVIE: 'UPDATE_MOVIE',
-  ADD_COMMENT: 'ADD_COMMENT',
-  DELETE_COMMENT: 'DELETE_COMMENT',
-};
-
-const UPDATE_TYPE = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
-  INIT: 'INIT',
-};
-
-const FILTER_TYPE = {
-  all: 'all',
-  watchlist: 'watchlist',
-  history: 'history',
-  favourites: 'favourites',
-  statistics: 'statistics',
-};
-
-const filter = {
-  [FILTER_TYPE.all]: (movies) => movies.slice(),
-  [FILTER_TYPE.watchlist]: (movies) => movies.filter((movie) => movie.isInWatchList === true),
-  [FILTER_TYPE.history]: (movies) => movies.filter((movie) => movie.isWatched === true),
-  [FILTER_TYPE.favourites]: (movies) => movies.filter((movie) => movie.isFavourite === true),
-  [FILTER_TYPE.statistics]: (movies) => movies.slice(),
-};
-
-const SORT_BUTTONS = {
-  default: 'default',
-  byDate: 'byDate',
-  byRating: 'byRating',
-  statistics: 'statistics',
-};
-
 const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
   BEFOREEND: 'beforeend',
@@ -116,4 +80,4 @@ const sortByDate = (firstMovie, secondMovie) => dayjs(secondMovie.details.releas
 
 const sortByrating = (firstMovie, secondMovie) => secondMovie.rating - firstMovie.rating;
 
-export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, replace, sortByDate, sortByrating, SORT_BUTTONS, USER_ACTION, UPDATE_TYPE, FILTER_TYPE, filter};
+export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, replace, sortByDate, sortByrating};

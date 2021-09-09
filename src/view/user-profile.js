@@ -21,7 +21,7 @@ const getUserRank = (watchedMoviesAmount) => {
 
 const createUserProfileTemplate = (moviesAmount) => {
   if(!getUserRank(moviesAmount)) {
-    return;
+    return ' ';
   }
 
   return `<section class="header__profile profile">
@@ -48,10 +48,6 @@ class UserProfile extends SmartView {
   _getMoviesAmount() {
     this._moviesAmount = this._movieModel.getMovies().filter((movie) => movie.isWatched).length;
     this.updateData({});
-  }
-
-  restoreHandlers() {
-    // Этот метод не нужен, но тогда ругается Smart компонент!
   }
 }
 

@@ -4,8 +4,9 @@ import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на 
 import SortView from '../view/sort.js';
 import LoadingView from '../view/loading.js';
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
-import UserStatisticsView from '../view/user-statistics.js'; // Кнопка показать еще
-import {render, RenderPosition, remove, sortByDate, sortByrating, SORT_BUTTONS, UPDATE_TYPE, USER_ACTION, filter} from '../js/utils.js';
+import UserStatisticsView from '../view/user-statistics.js'; // Статистика пользователя
+import {render, RenderPosition, remove, sortByDate, sortByrating} from '../js/utils.js';
+import {SortButtons, UpdateType, UserAction, filter} from '../js/const.js';
 import MoviePresenter, {State} from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
@@ -18,7 +19,7 @@ class Board {
     this._movieModel = movieModel;
     this._filterModel = filterModel;
     this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
-    this._currentSort = SORT_BUTTONS.default;
+    this._currentSort = SortButtons.default;
     this._isLoading = true;
     this._api = api;
     this._moviePresenterMap = new Map();
@@ -57,9 +58,9 @@ class Board {
     const filteredMovies = filter[this._filterType](movies);
 
     switch (this._currentSort) {
-      case SORT_BUTTONS.byDate:
+      case SortButtons.byDate:
         return filteredMovies.sort(sortByDate);
-      case SORT_BUTTONS.byRating:
+      case SortButtons.byRating:
         return filteredMovies.sort(sortByrating);
     }
     return filteredMovies;
@@ -147,12 +148,12 @@ class Board {
   _handleViewAction(actionType, updatedData, updateType) {
     const newData = Object.assign({}, updatedData);
     switch (actionType) {
-      case USER_ACTION.UPDATE_MOVIE:
+      case UserAction.UPDATE_MOVIE:
         this._api.updateMovie(updatedData)
           .then((response) => this._movieModel.updateMovie(updateType, response))
           .catch(() => {throw new Error('Ошибка рбновления карточки фильма');});
         break;
-      case USER_ACTION.ADD_COMMENT:
+      case UserAction.ADD_COMMENT:
         this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
         this._api.addComment(updatedData)
           .then((response) => {
@@ -164,7 +165,7 @@ class Board {
             throw new Error('Ошибка добавления коментария');
           });
         break;
-      case USER_ACTION.DELETE_COMMENT:
+      case UserAction.DELETE_COMMENT:
         this._moviePresenterMap.get(updatedData.movieId).setViewState(State.DELETING);
         this._api.deleteComment(updatedData)
           .then(() => this._movieModel.deleteComment(updateType, updatedData))
@@ -178,10 +179,10 @@ class Board {
 
   _handleModelEvent(updateType, updatedData) {
     switch (updateType) {
-      case UPDATE_TYPE.PATCH:
+      case UpdateType.PATCH:
         this._moviePresenterMap.get(updatedData.id).init(updatedData);
         break;
-      case UPDATE_TYPE.MINOR: {
+      case UpdateType.MINOR: {
         const isPopupOpened = this._moviePresenterMap.get(updatedData.id).isPopupOpened();
         this._clearBoard();
         this._renderBoard();
@@ -197,11 +198,11 @@ class Board {
         }
       }
         break;
-      case UPDATE_TYPE.MAJOR:
+      case UpdateType.MAJOR:
         this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
         this._renderBoard();
         break;
-      case UPDATE_TYPE.INIT:
+      case UpdateType.INIT:
         this._isLoading = false;
         remove(this._loadingComponent);
         this._renderBoard();
@@ -230,7 +231,7 @@ class Board {
     }
 
     if (resetSortType) {
-      this._currentSort = SORT_BUTTONS.default;
+      this._currentSort = SortButtons.default;
     }
   }
 

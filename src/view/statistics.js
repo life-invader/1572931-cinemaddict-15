@@ -22,10 +22,6 @@ class Statistics extends SmartView {
   getTemplate() {
     return createStatisticsTemplate(this._moviesAmount);
   }
-
-  restoreHandlers() {
-  // Этот метод не нужен, но тогда ругается Smart компонент!
-  }
 }
 
 export default Statistics;

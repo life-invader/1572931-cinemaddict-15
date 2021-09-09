@@ -1,10 +1,10 @@
 import AbstractObserver from '../js/abstract-observer.js';
-import {FILTER_TYPE} from '../js/utils.js';
+import {FilterType} from '../js/const.js';
 
 class MenuFilter extends AbstractObserver {
   constructor() {
     super();
-    this._activeFilter = FILTER_TYPE.all;
+    this._activeFilter = FilterType.all;
   }
 
   setFilter(updateType, filter, renderStatistics) {
