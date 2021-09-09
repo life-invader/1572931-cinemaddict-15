@@ -157,6 +157,7 @@ class Board {
         this._api.addComment(updatedData)
           .then((response) => {
             this._movieModel.addComment(updateType, response);
+            this._moviePresenterMap.get(newData.movieId).reset();
           })
           .catch(() => {
             this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
