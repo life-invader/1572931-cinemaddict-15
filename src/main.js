@@ -23,7 +23,7 @@ const boardPresenter = new BoardPresenter(mainElement, movieModel, menuFilterMod
 const menuFilterPresenter = new MenuFilterPresenter(mainElement, movieModel, menuFilterModel);
 
 
-render(headerElement, new UserProfileView(), RenderPosition.BEFOREEND); // Профиль юзера
+render(headerElement, new UserProfileView(movieModel), RenderPosition.BEFOREEND); // Профиль юзера
 render(footerElement, new StatisticsView(movieModel), RenderPosition.BEFOREEND); // Статистика с кол-вом фильмов в футере
 
 const MenuItem = {

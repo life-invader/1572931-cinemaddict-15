@@ -86,7 +86,7 @@ const renderChart = (statisticCtx, data) => {
   return myChart;
 };
 
-const createUserStatisticsTemplate = (data) => {
+const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
 
   const getUserRank = (watchedMoviesAmount) => {
     let userRank;
@@ -190,11 +190,11 @@ const createUserStatisticsTemplate = (data) => {
   //====================
 
   return `<section class="statistic">
-  ${getUserRank(data.length) ?
+  ${getUserRank(watchedMoviesTotal) ?
     `<p class="statistic__rank">
       Your rank
       <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">${getUserRank(data.length)}</span>
+      <span class="statistic__rank-label">${getUserRank(watchedMoviesTotal)}</span>
     </p>` : ''}
 
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -250,7 +250,7 @@ class UserStatistics extends SmartView {
   }
 
   getTemplate() {
-    return createUserStatisticsTemplate(this._sortedMovies);
+    return createUserStatisticsTemplate(this._sortedMovies, this._movies.length);
   }
 
   restoreHandlers() {
