@@ -9,7 +9,7 @@ const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const createFilmDetailsTemplate = (movie, data, comments) => {
   const {name, rating, duration, description, poster, isInWatchList, isWatched, isFavourite, details, ageRating} = movie;
-  const {isEmoji = false, newCommentEmojiPath = null, emoji, isAdding, isDeleting, deletingCommentId} = data;
+  const {isEmoji = false, newCommentEmojiPath = null, emoji, isAdding, isDeleting, deletingCommentId, commentMessage} = data;
 
   const formatMovieReleaseDate = (movieReleaseDate) => dayjs(movieReleaseDate).format('DD MMMM YYYY');
   const formatDuration = (movieDuration) => dayjs().startOf('day').add(movieDuration, 'minute').format('H[h] mm[m]');
@@ -114,7 +114,7 @@ const createFilmDetailsTemplate = (movie, data, comments) => {
                     <div class="film-details__add-emoji-label">${isEmoji ? `<img src=${newCommentEmojiPath} width="55" height="55" alt="emoji-smile">` : ''}</div>
 
                     <label class="film-details__comment-label">
-                      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isAdding ? 'disabled' : ''}></textarea>
+                      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isAdding ? 'disabled' : ''}>${commentMessage ? commentMessage : ''}</textarea>
                     </label>
 
                     <div class="film-details__emoji-list">
@@ -163,10 +163,6 @@ class MovieDetails extends SmartView {
     this._setInnerHandlers();
 
     this.updateData(data || {});
-
-    if(this._data.commentMessage) {
-      this.getElement().querySelector('.film-details__comment-input').value = this._data.commentMessage;
-    }
   }
 
   shake(callback) {
@@ -202,7 +198,7 @@ class MovieDetails extends SmartView {
   }
 
   _toggleCommentEmojiHandler(evt) {
-    if(this._data.newCommentEmojiPath === evt.target.src) {
+    if(this._data.newCommentEmojiPath === evt.target.src || this._data.isAdding) {
       return;
     }
 
@@ -212,12 +208,6 @@ class MovieDetails extends SmartView {
     this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, emoji: emoji, scrollTop: this.getElement().scrollTop});
     this.getElement().scrollTop = this._data.scrollTop;
     this.getElement().querySelector(id).setAttribute('checked','checked');
-
-    if(!this._data.commentMessage) {
-      return;
-    }
-
-    this.getElement().querySelector('.film-details__comment-input').value = this._data.commentMessage;
   }
 
   _commentInputHandler(evt) {
@@ -313,8 +303,6 @@ class MovieDetails extends SmartView {
     this._callback.addNewComment = callback;
     this.getElement().querySelector('.film-details__new-comment').addEventListener('keydown', this._addNewCommentHandler);
   }
-
-  // ==================================================================================================================================================================================
 }
 
 export default MovieDetails;

@@ -109,13 +109,9 @@ class Movie {
     remove(this._movieDetailsComponent);
   }
 
-  //===============================
-
   reset() {
     this._movieDetailsComponent.reset(this._movie);
   }
-
-  //===============================
 
   resetView() {
     this._handleCloseMovieDetailsPopup();

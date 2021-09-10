@@ -19,11 +19,9 @@ const BUTTONS = {
 const renderChart = (statisticCtx, data) => {
   const BAR_HEIGHT = 50;
 
-  const watchedMovies = data.filter((movie) => movie.isWatched);
-  const genres = [...new Set(watchedMovies.map((movie) => movie['details'].genres[0]))];
-  const amount = genres.map((genre) => watchedMovies.filter((movie) => movie['details'].genres[0] === genre).length);
+  const genres = [...new Set(data.map((movie) => movie['details'].genres[0]))];
+  const amount = genres.map((genre) => data.filter((movie) => movie['details'].genres[0] === genre).length);
 
-  // Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
   statisticCtx.height = BAR_HEIGHT * genres.length;
 
   const myChart = new Chart(statisticCtx, {
@@ -107,37 +105,7 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
     return userRank;
   };
 
-  // const movieDuration = data.map((movie) => movie.duration);
-  // let totalDuration;
-
-  // if(movieDuration.length > 0) {
-  //   totalDuration = movieDuration.reduce((accumulator, movie) => accumulator + movie);
-  // }
-
-  // const genres = data.map((movie) => movie['details'].genres[0]);
-  // let topGenre;
-
-  // //=============================================
-
-  // const count = genres.reduce((acc, n) => (acc[n] = (acc[n] || 0) + 1, acc), {});
-  // // console.log(count)
-  // const uniqueGenres = Object.entries(count).map((i) => i[0]); // Object.keys()
-  // // console.log(uniqueGenres);
-  // const amountOfEachGenre = Object.entries(count).map((i) => i[1]); // Object.values()
-  // // console.log(amountOfEachGenre);
-  // const maxNumber = Math.max(...Object.entries(count).map((i) => i[1]));
-  // // console.log(maxNumber);
-  // let maxNumberIndex;
-  // if(maxNumber >= 0) {
-  //   maxNumberIndex = amountOfEachGenre.indexOf(maxNumber);
-  //   // console.log(maxNumberIndex)
-  //   topGenre = uniqueGenres[maxNumberIndex];
-  // }
-  // const duplicateCount = Object.values(count).filter((n) => n > 1).length;
-
-  //====================
-
-  const getTotalRuntime = (totalMinutesAmount) => {
+  const getTotalDuration = (totalMinutesAmount) => {
     const referenceDate = dayjs().startOf('day');
     const date = referenceDate.add(totalMinutesAmount, 'minute');
     const hours = date.diff(referenceDate, 'hour');
@@ -145,7 +113,7 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
     return { hours, minutes };
   };
 
-  const getTopGenre = ({ genress }) => genress.length ? genress[0] : null;
+  const getTopGenre = ({genres}) => genres.length ? genres[0] : null;
 
   const getGenresStatistics = (watchedFilms) => {
     const genresStatistics = new Map();
@@ -157,20 +125,19 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
       });
     });
 
-    const genress = [];
+    const genres = [];
     const counts = [];
 
     Array.from(genresStatistics.entries())
       .sort(([, countA], [, countB]) => countB - countA)
       .forEach(([genre, countt]) => {
-        genress.push(genre);
+        genres.push(genre);
         counts.push(countt);
       });
 
-    return genress.length ? { genress, counts } : null;
+    return genres.length ? { genres, counts } : null;
   };
 
-  // console.log(getGenresStatistics(data));
 
   const getWatchedStatisticsData = (watchedFilms) => {
     const totalMinutesDuration = watchedFilms.reduce((duration1, film) => duration1 += film.duration, 0);
@@ -179,15 +146,12 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
     return {
       totalAmount: watchedFilms.length,
       genresStatistic: genresStatistic,
-      totalDuration: getTotalRuntime(totalMinutesDuration),
+      totalDuration: getTotalDuration(totalMinutesDuration),
       topGenre: genresStatistic && getTopGenre(genresStatistic),
     };
   };
 
   const statisticsData = getWatchedStatisticsData(data);
-  // console.log(getWatchedStatisticsData(data));
-
-  //====================
 
   return `<section class="statistic">
   ${getUserRank(watchedMoviesTotal) ?
@@ -238,7 +202,6 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
   </section>`;
 };
 
-// ${totalDuration && totalDuration.hours || 0} // ${totalDuration && totalDuration.minutes || 0}
 class UserStatistics extends SmartView {
   constructor(data = []) {
     super();

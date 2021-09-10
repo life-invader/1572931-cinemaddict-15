@@ -76,7 +76,6 @@ class Movies extends AbstractObserver {
       },
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedMovie['film_info'];
     delete adaptedMovie['user_details'];
 
@@ -114,7 +113,6 @@ class Movies extends AbstractObserver {
       },
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedMovie.name;
     delete adaptedMovie.alternativeName;
     delete adaptedMovie.rating;
