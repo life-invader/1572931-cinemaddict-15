@@ -286,7 +286,7 @@ class MovieDetails extends SmartView {
   }
 
   _addNewCommentHandler(evt) {
-    if(evt.key === 'Enter' && evt.ctrlKey) {
+    if(evt.key === 'Enter' && evt.ctrlKey || evt.key === 'Enter' && evt.metaKey) {
       if(this._data.emoji && this._data.commentMessage) {
         this.updateData({scrollTop: this.getElement().scrollTop}, true);
         this._callback.addNewComment(he.encode(this._data.commentMessage), this._data.emoji);
