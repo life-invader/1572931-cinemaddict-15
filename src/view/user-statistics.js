@@ -8,12 +8,19 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(objectSupport);
 dayjs.extend(duration);
 
+const DateCompare = {
+  TODAY: dayjs().subtract(1, 'day'),
+  WEEK: dayjs().subtract(7, 'day'),
+  MONTH: dayjs().subtract(1, 'month'),
+  YEAR: dayjs().subtract(1, 'year'),
+};
+
 const BUTTONS = {
-  AllTime: 'all-time',
-  Today: 'today',
-  Week: 'week',
-  Month: 'month',
-  Year: 'year',
+  ALLTIME: 'all-time',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
 };
 
 const renderChart = (statisticCtx, data) => {
@@ -222,19 +229,19 @@ class UserStatistics extends SmartView {
 
   _getMovies(button) {
     switch (button) {
-      case BUTTONS.Today:
-        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'hours') < 24);
+      case BUTTONS.TODAY:
+        this._sortedMovies = this._movies.filter((movie) => DateCompare.TODAY.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.Week:
-        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'day') < 7);
+      case BUTTONS.WEEK:
+        this._sortedMovies = this._movies.filter((movie) => DateCompare.WEEK.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.Month:
-        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'day') < 30);
+      case BUTTONS.MONTH:
+        this._sortedMovies = this._movies.filter((movie) => DateCompare.MONTH.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.Year:
-        this._sortedMovies = this._movies.filter((movie) => dayjs().diff(movie['watching_date'], 'month') < 12);
+      case BUTTONS.YEAR:
+        this._sortedMovies = this._movies.filter((movie) => DateCompare.YEAR.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.AllTime:
+      case BUTTONS.ALLTIME:
         this._sortedMovies = this._movies;
         break;
     }
