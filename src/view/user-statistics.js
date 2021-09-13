@@ -15,7 +15,7 @@ const DateCompare = {
   YEAR: dayjs().subtract(1, 'year'),
 };
 
-const BUTTONS = {
+const Buttons = {
   ALLTIME: 'all-time',
   TODAY: 'today',
   WEEK: 'week',
@@ -96,13 +96,13 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
   const getUserRank = (watchedMoviesAmount) => {
     let userRank;
     switch (true) {
-      case watchedMoviesAmount > 21:
+      case watchedMoviesAmount > 20:
         userRank = 'Movie buff';
         break;
-      case watchedMoviesAmount > 11:
+      case watchedMoviesAmount > 10:
         userRank = 'Fan';
         break;
-      case watchedMoviesAmount > 1:
+      case watchedMoviesAmount > 0:
         userRank = 'Novice';
         break;
       default:
@@ -127,8 +127,8 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
 
     watchedFilms.forEach(({ details }) => {
       details.genres.forEach((genre) => {
-        const countt = genresStatistics.has(genre) ? genresStatistics.get(genre) : 0;
-        genresStatistics.set(genre, countt + 1);
+        const count = genresStatistics.has(genre) ? genresStatistics.get(genre) : 0;
+        genresStatistics.set(genre, count + 1);
       });
     });
 
@@ -137,9 +137,9 @@ const createUserStatisticsTemplate = (data, watchedMoviesTotal) => {
 
     Array.from(genresStatistics.entries())
       .sort(([, countA], [, countB]) => countB - countA)
-      .forEach(([genre, countt]) => {
+      .forEach(([genre, count]) => {
         genres.push(genre);
-        counts.push(countt);
+        counts.push(count);
       });
 
     return genres.length ? { genres, counts } : null;
@@ -229,19 +229,19 @@ class UserStatistics extends SmartView {
 
   _getMovies(button) {
     switch (button) {
-      case BUTTONS.TODAY:
+      case Buttons.TODAY:
         this._sortedMovies = this._movies.filter((movie) => DateCompare.TODAY.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.WEEK:
+      case Buttons.WEEK:
         this._sortedMovies = this._movies.filter((movie) => DateCompare.WEEK.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.MONTH:
+      case Buttons.MONTH:
         this._sortedMovies = this._movies.filter((movie) => DateCompare.MONTH.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.YEAR:
+      case Buttons.YEAR:
         this._sortedMovies = this._movies.filter((movie) => DateCompare.YEAR.isBefore(movie['watching_date']));
         break;
-      case BUTTONS.ALLTIME:
+      case Buttons.ALLTIME:
         this._sortedMovies = this._movies;
         break;
     }

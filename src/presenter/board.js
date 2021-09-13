@@ -224,11 +224,7 @@ class Board {
       remove(this._noMoviesComponent);
     }
 
-    if(resetRenderedTaskCount) {
-      this._renderedMoviesCount = SHOW_MORE_MOVIES_BUTTON_STEP;
-    } else {
-      this._renderedMoviesCount = Math.min(movieCount, this._renderedMoviesCount);
-    }
+    this._renderedMoviesCount = resetRenderedTaskCount ? SHOW_MORE_MOVIES_BUTTON_STEP : Math.min(movieCount, this._renderedMoviesCount);
 
     if (resetSortType) {
       this._currentSort = SortButton.DEFAULT;
