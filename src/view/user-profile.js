@@ -3,13 +3,13 @@ import SmartView from './smart.js';
 const getUserRank = (watchedMoviesAmount) => {
   let userRank;
   switch (true) {
-    case watchedMoviesAmount > 21:
+    case watchedMoviesAmount > 20:
       userRank = 'Movie buff';
       break;
-    case watchedMoviesAmount > 11:
+    case watchedMoviesAmount > 10:
       userRank = 'Fan';
       break;
-    case watchedMoviesAmount > 1:
+    case watchedMoviesAmount > 0:
       userRank = 'Novice';
       break;
     default:
