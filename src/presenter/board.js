@@ -116,7 +116,6 @@ class Board {
 
   _renderMovieCards(movies) {
     movies.forEach((movie) => this._renderMovieCard(movie));
-    console.log(movies)
   }
 
   _clearMovieList() {
@@ -216,7 +215,7 @@ class Board {
         break;
       case UpdateType.MAJOR:
         this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
-        // this._renderBoard();
+        this._renderBoard();
         break;
       case UpdateType.INIT:
         this._isLoading = false;
@@ -245,8 +244,6 @@ class Board {
     }
 
     this._renderedMoviesCount = resetRenderedTaskCount ? SHOW_MORE_MOVIES_BUTTON_STEP : Math.min(movieCount, this._renderedMoviesCount);
-    console.log(movieCount)
-    console.log(this._renderedMoviesCount)
     if (resetSortType) {
       this._currentSort = SortButton.DEFAULT;
     }
@@ -301,9 +298,6 @@ class Board {
     render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._extraBlockComponent, RenderPosition.BEFOREEND); // 1 Extra block
     render(this._boardComponent, this._extraBlockCommentsComponent, RenderPosition.BEFOREEND); // 2 Extra block
-    console.log('moviesCount = ', moviesCount);
-    console.log('_renderedMoviesCount = ', this._renderedMoviesCount);
-    console.log(Math.min(moviesCount, this._renderedMoviesCount))
 
     this._renderMovieCards(movies.slice(0, Math.min(moviesCount, this._renderedMoviesCount)));
     this._renderExtraBlocks();
