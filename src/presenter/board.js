@@ -1,6 +1,8 @@
 import BoardView from '../view/board.js'; // Поле с фильмами
 import FilmListView from '../view/film-list.js'; // главный контейнер для карточек фильмов и кнопки
 import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на случай отсутсвия фильмов
+import FilmListExtraView from '../view/film-list-extra.js'; // Дополнительный блок
+import FilmListExtraCommentsView from '../view/film-list-extra-comments.js'; // Дополнительный блок
 import SortView from '../view/sort.js';
 import LoadingView from '../view/loading.js';
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
@@ -10,6 +12,17 @@ import {SortButton, UpdateType, UserAction, Filter} from '../js/const.js';
 import MoviePresenter, {State} from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
+
+// const ExtraBlocks = [
+//   {
+//     NAME: 'Top rated',
+//     MOVIES: (first, second) => second.rating - first.rating,
+//   },
+//   {
+//     NAME: 'Most commented',
+//     MOVIES: (first, second) => second.comments.length - first.comments.length,
+//   },
+// ];
 
 const mainElement = document.querySelector('.main');
 
@@ -30,6 +43,8 @@ class Board {
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
     this._noMoviesComponent = new EmptyFilmListView();
+    this._extraBlockComponent = new FilmListExtraView();
+    this._extraBlockCommentsComponent = new FilmListExtraCommentsView();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -101,6 +116,7 @@ class Board {
 
   _renderMovieCards(movies) {
     movies.forEach((movie) => this._renderMovieCard(movie));
+    console.log(movies)
   }
 
   _clearMovieList() {
@@ -151,7 +167,7 @@ class Board {
       case UserAction.UPDATE_MOVIE:
         this._api.updateMovie(updatedData)
           .then((response) => this._movieModel.updateMovie(updateType, response))
-          .catch(() => {throw new Error('Ошибка рбновления карточки фильма');});
+          .catch(() => {throw new Error('Ошибка обновления карточки фильма');});
         break;
       case UserAction.ADD_COMMENT:
         this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
@@ -200,7 +216,7 @@ class Board {
         break;
       case UpdateType.MAJOR:
         this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
-        this._renderBoard();
+        // this._renderBoard();
         break;
       case UpdateType.INIT:
         this._isLoading = false;
@@ -214,18 +230,23 @@ class Board {
     const movieCount = this._getMovies().length;
 
     this._moviePresenterMap.forEach((presenter) => presenter.destroy());
+    // this._moviePresenterExtraCommentsMap.forEach((presenter) => presenter.destroy());
+    // this._moviePresenterExtraMap.forEach((presenter) => presenter.destroy());
     this._moviePresenterMap.clear();
 
     remove(this._sortComponent);
     remove(this._loadingComponent);
     remove(this._showMoreButtonComponent);
+    remove(this._extraBlockComponent);
+    remove(this._extraBlockCommentsComponent);
 
     if(this._noMoviesComponent) {
       remove(this._noMoviesComponent);
     }
 
     this._renderedMoviesCount = resetRenderedTaskCount ? SHOW_MORE_MOVIES_BUTTON_STEP : Math.min(movieCount, this._renderedMoviesCount);
-
+    console.log(movieCount)
+    console.log(this._renderedMoviesCount)
     if (resetSortType) {
       this._currentSort = SortButton.DEFAULT;
     }
@@ -233,6 +254,32 @@ class Board {
 
   _renderStatistics() {
     render(mainElement, this._userStatisticsComponent, RenderPosition.BEFOREEND); // Статистика юзера
+  }
+
+  _renderExtraBlocks() {
+    this._moviePresenterExtraCommentsMap = new Map();
+
+    const movieContainer = this._extraBlockComponent.getElement().querySelector('.films-list__container');
+    const allMovies = this._movieModel.getMovies();
+    const extraBlockMovies = allMovies.slice().sort((first, second) => second.rating - first.rating);
+    extraBlockMovies.slice(0, 2).forEach((movie) => {
+      const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
+      moviePresenter.init(movie);
+      this._moviePresenterMap.set(movie.id, moviePresenter);
+    });
+  }
+
+  _renderExtraCommentsBlocks() {
+    this._moviePresenterExtraMap = new Map();
+
+    const movieContainer = this._extraBlockCommentsComponent.getElement().querySelector('.films-list__container');
+    const allMovies = this._movieModel.getMovies();
+    const extraBlockMovies = allMovies.slice().sort((first, second) => second.comments.length - first.comments.length);
+    extraBlockMovies.slice(0, 2).forEach((movie) => {
+      const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
+      moviePresenter.init(movie);
+      this._moviePresenterMap.set(movie.id, moviePresenter);
+    });
   }
 
   _renderBoard() {
@@ -252,8 +299,15 @@ class Board {
     this._renderSort();
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
+    render(this._boardComponent, this._extraBlockComponent, RenderPosition.BEFOREEND); // 1 Extra block
+    render(this._boardComponent, this._extraBlockCommentsComponent, RenderPosition.BEFOREEND); // 2 Extra block
+    console.log('moviesCount = ', moviesCount);
+    console.log('_renderedMoviesCount = ', this._renderedMoviesCount);
+    console.log(Math.min(moviesCount, this._renderedMoviesCount))
 
     this._renderMovieCards(movies.slice(0, Math.min(moviesCount, this._renderedMoviesCount)));
+    this._renderExtraBlocks();
+    this._renderExtraCommentsBlocks();
 
     if(moviesCount > this._renderedMoviesCount) {
       this._renderShowMoreButton();
