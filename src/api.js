@@ -1,5 +1,10 @@
 import MovieModel from './model/movie.js';
 
+const Links = {
+  MOVIES: 'movies',
+  COMMENTS: 'comments',
+};
+
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
@@ -19,14 +24,14 @@ class Api {
   }
 
   getMovies() {
-    return this._load({url: 'movies'})
+    return this._load({url: Links.MOVIES})
       .then(Api.toJSON)
       .then((movies) => movies.map(MovieModel.adaptToClient));
   }
 
   updateMovie(movie) {
     return this._load({
-      url: `movies/${movie.id}`,
+      url: `${Links.MOVIES}/${movie.id}`,
       method: Method.PUT,
       body: JSON.stringify(MovieModel.adaptToServer(movie)),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -36,7 +41,7 @@ class Api {
   }
 
   getComments(movieId) {
-    return this._load({url: `comments/${movieId}`})
+    return this._load({url: `${Links.COMMENTS}/${movieId}`})
       .then(Api.toJSON)
       .then((comments) => comments)
       .catch(() => {throw new Error('Ошибка получения списка комментариев');});
@@ -44,7 +49,7 @@ class Api {
 
   addComment(comment) {
     return this._load({
-      url: `comments/${comment.movieId}`,
+      url: `${Links.COMMENTS}/${comment.movieId}`,
       method: Method.POST,
       body: JSON.stringify(MovieModel.adaptCommentToServer(comment)),
       headers: new Headers({'Content-Type': 'application/json'}),
@@ -56,7 +61,7 @@ class Api {
 
   deleteComment(commentToDelete) {
     return this._load({
-      url: `comments/${commentToDelete.commentId}`,
+      url: `${Links.COMMENTS}/${commentToDelete.commentId}`,
       method: Method.DELETE,
       headers: new Headers({'Content-Type': 'application/json'}),
     })
