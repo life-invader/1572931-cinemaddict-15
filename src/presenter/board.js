@@ -169,40 +169,118 @@ class Board {
           .catch(() => {throw new Error('Ошибка обновления карточки фильма');});
         break;
       case UserAction.ADD_COMMENT:
-        this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
+        if(this._moviePresenterMap.has(updatedData.movieId)) {
+          this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
+        }
+        if(this._moviePresenterExtraCommentsMap.has(updatedData.movieId)) {
+          this._moviePresenterExtraCommentsMap.get(updatedData.movieId).setViewState(State.ADDING);
+        }
+        if(this._moviePresenterExtraMap.has(updatedData.movieId)) {
+          this._moviePresenterExtraMap.get(updatedData.movieId).setViewState(State.ADDING);
+        }
+        // this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
         this._api.addComment(updatedData)
           .then((response) => {
             this._movieModel.addComment(updateType, response);
-            this._moviePresenterMap.get(newData.movieId).reset();
+            if(this._moviePresenterMap.has(newData.movieId)) {
+              this._moviePresenterMap.get(newData.movieId).reset();
+            }
+            if(this._moviePresenterExtraCommentsMap.has(newData.movieId)) {
+              this._moviePresenterExtraCommentsMap.get(newData.movieId).reset();
+            }
+            if(this._moviePresenterExtraMap.has(newData.movieId)) {
+              this._moviePresenterExtraMap.get(newData.movieId).reset();
+            }
+            // this._moviePresenterMap.get(newData.movieId).reset();
           })
           .catch(() => {
-            this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
+            if(this._moviePresenterMap.has(newData.movieId)) {
+              this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
+            }
+            if(this._moviePresenterExtraCommentsMap.has(newData.movieId)) {
+              this._moviePresenterExtraCommentsMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
+            }
+            if(this._moviePresenterExtraMap.has(newData.movieId)) {
+              this._moviePresenterExtraMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
+            }
+            // this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
             throw new Error('Ошибка добавления коментария');
           });
         break;
       case UserAction.DELETE_COMMENT:
-        this._moviePresenterMap.get(updatedData.movieId).setViewState(State.DELETING);
+        if(this._moviePresenterMap.has(newData.movieId)) {
+          this._moviePresenterMap.get(newData.movieId).setViewState(State.DELETING);
+        }
+        if(this._moviePresenterExtraCommentsMap.has(newData.movieId)) {
+          this._moviePresenterExtraCommentsMap.get(newData.movieId).setViewState(State.DELETING);
+        }
+        if(this._moviePresenterExtraMap.has(newData.movieId)) {
+          this._moviePresenterExtraMap.get(newData.movieId).setViewState(State.DELETING);
+        }
+        // this._moviePresenterMap.get(updatedData.movieId).setViewState(State.DELETING);
         this._api.deleteComment(updatedData)
           .then(() => this._movieModel.deleteComment(updateType, updatedData))
           .catch(() => {
-            this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING_DELETING);
+            if(this._moviePresenterMap.has(newData.movieId)) {
+              this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
+            }
+            if(this._moviePresenterExtraCommentsMap.has(newData.movieId)) {
+              this._moviePresenterExtraCommentsMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
+            }
+            if(this._moviePresenterExtraMap.has(newData.movieId)) {
+              this._moviePresenterExtraMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
+            }
+            // this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING_DELETING);
             throw new Error('Ошибка удаления коментария');
           });
         break;
     }
   }
 
+  _checkMap(updatedData) {
+    if(this._moviePresenterMap.has(updatedData.id)) {
+      this._moviePresenterMap.get(updatedData.id).init(updatedData);
+    }
+    if(this._moviePresenterExtraCommentsMap.has(updatedData.id)) {
+      this._moviePresenterExtraCommentsMap.get(updatedData.id).init(updatedData);
+    }
+    if(this._moviePresenterExtraMap.has(updatedData.id)) {
+      this._moviePresenterExtraMap.get(updatedData.id).init(updatedData);
+    }
+  }
+
   _handleModelEvent(updateType, updatedData) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._moviePresenterMap.get(updatedData.id).init(updatedData);
+        this._checkMap(updatedData);
+        // this._moviePresenterMap.get(updatedData.id).init(updatedData);
         break;
       case UpdateType.MINOR: {
-        const isPopupOpened = this._moviePresenterMap.get(updatedData.id).isPopupOpened();
+        // const isPopupOpened = this._moviePresenterMap.get(updatedData.id).isPopupOpened();
+        let isPopupOpened;
+        if(this._moviePresenterMap.has(updatedData.id)) {
+          isPopupOpened = this._moviePresenterMap.get(updatedData.id).isPopupOpened();
+        }
+        if(this._moviePresenterExtraCommentsMap.has(updatedData.id)) {
+          isPopupOpened = this._moviePresenterExtraCommentsMap.get(updatedData.id).isPopupOpened();
+        }
+        if(this._moviePresenterExtraMap.has(updatedData.id)) {
+          isPopupOpened = this._moviePresenterExtraMap.get(updatedData.id).isPopupOpened();
+        }
         this._clearBoard();
         this._renderBoard();
 
-        let moviePresenter = this._moviePresenterMap.get(updatedData.id);
+        // let moviePresenter = this._moviePresenterMap.get(updatedData.id);
+        let moviePresenter;
+        if(this._moviePresenterMap.has(updatedData.id)) {
+          moviePresenter = this._moviePresenterMap.get(updatedData.id);
+        }
+        if(this._moviePresenterExtraCommentsMap.has(updatedData.id)) {
+          moviePresenter = this._moviePresenterExtraCommentsMap.get(updatedData.id);
+        }
+        if(this._moviePresenterExtraMap.has(updatedData.id)) {
+          moviePresenter = this._moviePresenterExtraMap.get(updatedData.id);
+        }
         if(!moviePresenter){
           moviePresenter = new MoviePresenter(null, this._handleViewAction, this._handleModechange, this._api);
           moviePresenter.init(updatedData);
@@ -229,9 +307,11 @@ class Board {
     const movieCount = this._getMovies().length;
 
     this._moviePresenterMap.forEach((presenter) => presenter.destroy());
-    // this._moviePresenterExtraCommentsMap.forEach((presenter) => presenter.destroy());
-    // this._moviePresenterExtraMap.forEach((presenter) => presenter.destroy());
+    this._moviePresenterExtraCommentsMap.forEach((presenter) => presenter.destroy());
+    this._moviePresenterExtraMap.forEach((presenter) => presenter.destroy());
     this._moviePresenterMap.clear();
+    this._moviePresenterExtraCommentsMap.clear();
+    this._moviePresenterExtraMap.clear();
 
     remove(this._sortComponent);
     remove(this._loadingComponent);
@@ -254,7 +334,7 @@ class Board {
   }
 
   _renderExtraBlocks() {
-    this._moviePresenterExtraCommentsMap = new Map();
+    this._moviePresenterExtraMap = new Map();
 
     const movieContainer = this._extraBlockComponent.getElement().querySelector('.films-list__container');
     const allMovies = this._movieModel.getMovies();
@@ -262,12 +342,12 @@ class Board {
     extraBlockMovies.slice(0, 2).forEach((movie) => {
       const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
       moviePresenter.init(movie);
-      this._moviePresenterMap.set(movie.id, moviePresenter);
+      this._moviePresenterExtraMap.set(movie.id, moviePresenter);
     });
   }
 
   _renderExtraCommentsBlocks() {
-    this._moviePresenterExtraMap = new Map();
+    this._moviePresenterExtraCommentsMap = new Map();
 
     const movieContainer = this._extraBlockCommentsComponent.getElement().querySelector('.films-list__container');
     const allMovies = this._movieModel.getMovies();
@@ -275,7 +355,7 @@ class Board {
     extraBlockMovies.slice(0, 2).forEach((movie) => {
       const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
       moviePresenter.init(movie);
-      this._moviePresenterMap.set(movie.id, moviePresenter);
+      this._moviePresenterExtraCommentsMap.set(movie.id, moviePresenter);
     });
   }
 
