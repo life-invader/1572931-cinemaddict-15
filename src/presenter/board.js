@@ -36,6 +36,8 @@ class Board {
     this._isLoading = true;
     this._api = api;
     this._moviePresenterMap = new Map();
+    this._moviePresenterExtraMap = new Map();
+    this._moviePresenterExtraCommentsMap = new Map();
 
     this._boardComponent = new BoardView();
     this._filmListComponent = new FilmListView();
@@ -51,7 +53,6 @@ class Board {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModechange = this._handleModechange.bind(this);
     this._handleSortChange = this._handleSortChange.bind(this);
-
   }
 
   init() {
@@ -178,7 +179,6 @@ class Board {
         if(this._moviePresenterExtraMap.has(updatedData.movieId)) {
           this._moviePresenterExtraMap.get(updatedData.movieId).setViewState(State.ADDING);
         }
-        // this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
         this._api.addComment(updatedData)
           .then((response) => {
             this._movieModel.addComment(updateType, response);
@@ -191,7 +191,7 @@ class Board {
             if(this._moviePresenterExtraMap.has(newData.movieId)) {
               this._moviePresenterExtraMap.get(newData.movieId).reset();
             }
-            // this._moviePresenterMap.get(newData.movieId).reset();
+            this._reRenderExtraCommentsBlocks();
           })
           .catch(() => {
             if(this._moviePresenterMap.has(newData.movieId)) {
@@ -203,7 +203,6 @@ class Board {
             if(this._moviePresenterExtraMap.has(newData.movieId)) {
               this._moviePresenterExtraMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
             }
-            // this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
             throw new Error('Ошибка добавления коментария');
           });
         break;
@@ -217,9 +216,11 @@ class Board {
         if(this._moviePresenterExtraMap.has(newData.movieId)) {
           this._moviePresenterExtraMap.get(newData.movieId).setViewState(State.DELETING);
         }
-        // this._moviePresenterMap.get(updatedData.movieId).setViewState(State.DELETING);
         this._api.deleteComment(updatedData)
-          .then(() => this._movieModel.deleteComment(updateType, updatedData))
+          .then(() => {
+            this._movieModel.deleteComment(updateType, updatedData);
+            this._reRenderExtraCommentsBlocks();
+          })
           .catch(() => {
             if(this._moviePresenterMap.has(newData.movieId)) {
               this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
@@ -230,7 +231,6 @@ class Board {
             if(this._moviePresenterExtraMap.has(newData.movieId)) {
               this._moviePresenterExtraMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
             }
-            // this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ABORTING_DELETING);
             throw new Error('Ошибка удаления коментария');
           });
         break;
@@ -322,7 +322,6 @@ class Board {
     if(this._noMoviesComponent) {
       remove(this._noMoviesComponent);
     }
-
     this._renderedMoviesCount = resetRenderedTaskCount ? SHOW_MORE_MOVIES_BUTTON_STEP : Math.min(movieCount, this._renderedMoviesCount);
     if (resetSortType) {
       this._currentSort = SortButton.DEFAULT;
@@ -333,12 +332,20 @@ class Board {
     render(mainElement, this._userStatisticsComponent, RenderPosition.BEFOREEND); // Статистика юзера
   }
 
-  _renderExtraBlocks() {
-    this._moviePresenterExtraMap = new Map();
-
+  _renderExtraBlocks(replace = false) {
     const movieContainer = this._extraBlockComponent.getElement().querySelector('.films-list__container');
+
+    if(replace) {
+      this._moviePresenterExtraCommentsMap.forEach((presenter) => presenter.destroy());
+    }
+
     const allMovies = this._movieModel.getMovies();
     const extraBlockMovies = allMovies.slice().sort((first, second) => second.rating - first.rating);
+    if(extraBlockMovies.every((movie) => movie.rating === 0)) {
+      return;
+    }
+
+    render(this._boardComponent, this._extraBlockComponent, RenderPosition.BEFOREEND); // 1 Extra block
     extraBlockMovies.slice(0, 2).forEach((movie) => {
       const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
       moviePresenter.init(movie);
@@ -346,17 +353,30 @@ class Board {
     });
   }
 
-  _renderExtraCommentsBlocks() {
-    this._moviePresenterExtraCommentsMap = new Map();
+  // _reRenderExtraBlocks() {
+  //   this._extraBlockComponent ? remove(this._extraBlockComponent) : '';
+  //   this._renderExtraBlocks();
+  // }
 
+  _renderExtraCommentsBlocks() {
     const movieContainer = this._extraBlockCommentsComponent.getElement().querySelector('.films-list__container');
     const allMovies = this._movieModel.getMovies();
     const extraBlockMovies = allMovies.slice().sort((first, second) => second.comments.length - first.comments.length);
+    if(extraBlockMovies.every((movie) => movie.comments.length === 0)) {
+      return;
+    }
+
+    render(this._boardComponent, this._extraBlockCommentsComponent, RenderPosition.BEFOREEND); // 2 Extra block
     extraBlockMovies.slice(0, 2).forEach((movie) => {
       const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
       moviePresenter.init(movie);
       this._moviePresenterExtraCommentsMap.set(movie.id, moviePresenter);
     });
+  }
+
+  _reRenderExtraCommentsBlocks() {
+    this._extraBlockCommentsComponent ? remove(this._extraBlockCommentsComponent) : '';
+    this._renderExtraCommentsBlocks();
   }
 
   _renderBoard() {
@@ -376,8 +396,6 @@ class Board {
     this._renderSort();
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
-    render(this._boardComponent, this._extraBlockComponent, RenderPosition.BEFOREEND); // 1 Extra block
-    render(this._boardComponent, this._extraBlockCommentsComponent, RenderPosition.BEFOREEND); // 2 Extra block
 
     this._renderMovieCards(movies.slice(0, Math.min(moviesCount, this._renderedMoviesCount)));
     this._renderExtraBlocks();

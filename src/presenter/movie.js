@@ -131,6 +131,7 @@ class Movie {
   _handleCloseMovieDetailsPopup() {
     document.body.classList.remove('hide-overflow');
     this._movieDetailsComponent.getElement().remove();
+    this._movieDetailsComponent.updateData({scrollTop: null}, true);
     document.removeEventListener('keydown', this._onEscKeyDown);
   }
 
