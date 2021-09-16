@@ -118,7 +118,7 @@ const createFilmDetailsTemplate = (movie, data, comments) => {
                     </label>
 
                     <div class="film-details__emoji-list">
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" ${isAdding ? 'disabled' : ''} id="emoji-smile" value="smile ${emoji === 'smile' ? 'checked' : ''}">
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" ${isAdding ? 'disabled' : ''} id="emoji-smile" value="smile" ${emoji === 'smile' ? 'checked' : ''}>
                       <label class="film-details__emoji-label" for="emoji-smile">
                         <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
                       </label>
