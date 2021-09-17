@@ -182,7 +182,6 @@ class Movie {
     };
 
     this._updateData(UserAction.ADD_COMMENT, newComment, UpdateType.PATCH);
-    this._movieDetailsComponent.updateData({isAdding: false});
   }
 }
 

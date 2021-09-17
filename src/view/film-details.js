@@ -8,8 +8,27 @@ dayjs.extend(relativeTime);
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const createFilmDetailsTemplate = (movie, data, comments) => {
-  const {name, rating, duration, description, poster, isInWatchList, isWatched, isFavourite, details, ageRating} = movie;
-  const {isEmoji = false, newCommentEmojiPath = null, emoji, isAdding, isDeleting, deletingCommentId, commentMessage} = data;
+  const {
+    name,
+    rating,
+    duration,
+    description,
+    poster,
+    isInWatchList,
+    isWatched,
+    isFavourite,
+    details,
+    ageRating,
+  } = movie;
+  const {
+    isEmoji = false,
+    newCommentEmojiPath = null,
+    emoji,
+    isAdding,
+    isDeleting,
+    deletingCommentId,
+    commentMessage,
+  } = data;
 
   const formatMovieReleaseDate = (movieReleaseDate) => dayjs(movieReleaseDate).format('DD MMMM YYYY');
   const formatDuration = (movieDuration) => dayjs().startOf('day').add(movieDuration, 'minute').format('H[h] mm[m]');
@@ -194,20 +213,32 @@ class MovieDetails extends SmartView {
 
   reset(movie) {
     this._movie = movie;
-    this.updateData({newCommentEmojiPath: null, isEmoji: false, commentMessage: null, emoji: null});
+    this.updateData({
+      newCommentEmojiPath: null,
+      isEmoji: false,
+      commentMessage: null,
+      emoji: null,
+      isAdding: false,
+      isDeleting: false,
+    });
   }
 
   _toggleCommentEmojiHandler(evt) {
-    if(this._data.newCommentEmojiPath === evt.target.src || this._data.isAdding) {
+    if (this._data.newCommentEmojiPath === evt.target.src || this._data.isAdding) {
       return;
     }
 
     const id = `#${evt.currentTarget.getAttribute('for')}`;
     const emoji = this.getElement().querySelector(id).value;
 
-    this.updateData({newCommentEmojiPath: evt.target.src, isEmoji: true, emoji: emoji, scrollTop: this.getElement().scrollTop});
+    this.updateData({
+      newCommentEmojiPath: evt.target.src,
+      isEmoji: true,
+      emoji: emoji,
+      scrollTop: this.getElement().scrollTop,
+    });
     this.getElement().scrollTop = this._data.scrollTop;
-    this.getElement().querySelector(id).setAttribute('checked','checked');
+    this.getElement().querySelector(id).setAttribute('checked', 'checked');
   }
 
   _commentInputHandler(evt) {
@@ -225,7 +256,7 @@ class MovieDetails extends SmartView {
   _setInnerHandlers() {
     this.getElement().querySelectorAll('.film-details__emoji-label').forEach((emoji) => emoji.addEventListener('click', this._toggleCommentEmojiHandler));
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._commentInputHandler);
-    if(this._movie.comments.length > 0) {
+    if (this._movie.comments.length > 0) {
       this.getElement().querySelectorAll('.film-details__comment').forEach((element) => element.addEventListener('click', this._commentDeleteClickHandler));
     }
     this.getElement().querySelector('.film-details__new-comment').addEventListener('keydown', this._addNewCommentHandler);
@@ -269,7 +300,7 @@ class MovieDetails extends SmartView {
   }
 
   _commentDeleteClickHandler(evt) {
-    if(evt.target.tagName !== 'BUTTON') {
+    if (evt.target.tagName !== 'BUTTON') {
       return;
     }
 
@@ -280,18 +311,18 @@ class MovieDetails extends SmartView {
 
   setDeleteCommentClickHandler(callback) {
     this._callback.deleteComment = callback;
-    if(this._movie.comments.length > 0) {
+    if (this._movie.comments.length > 0) {
       this.getElement().querySelectorAll('.film-details__comment').forEach((element) => element.addEventListener('click', this._commentDeleteClickHandler));
     }
   }
 
   _addNewCommentHandler(evt) {
-    if(evt.key === 'Enter' && evt.ctrlKey || evt.key === 'Enter' && evt.metaKey) {
-      if(this._data.emoji && this._data.commentMessage) {
+    if (evt.key === 'Enter' && evt.ctrlKey || evt.key === 'Enter' && evt.metaKey) {
+      if (this._data.emoji && this._data.commentMessage) {
         this.updateData({scrollTop: this.getElement().scrollTop}, true);
         this._callback.addNewComment(he.encode(this._data.commentMessage), this._data.emoji);
       } else {
-        const commentInput =  this.getElement().querySelector('.film-details__comment-input');
+        const commentInput = this.getElement().querySelector('.film-details__comment-input');
         commentInput.setCustomValidity('Выберите эмоцию и напишите текст комментария!');
         commentInput.reportValidity();
       }

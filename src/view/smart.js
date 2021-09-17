@@ -31,8 +31,10 @@ class Smart extends Abstract {
 
     const newElement = this.getElement();
 
-    parent.replaceChild(newElement, prevElement);
-    this.getElement().scrollTop = this._data.scrollTop;
+    if(parent) {
+      parent.replaceChild(newElement, prevElement);
+      this.getElement().scrollTop = this._data.scrollTop;
+    }
     this.restoreHandlers();
   }
 

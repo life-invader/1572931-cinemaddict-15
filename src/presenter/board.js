@@ -12,17 +12,7 @@ import {SortButton, UpdateType, UserAction, Filter} from '../js/const.js';
 import MoviePresenter, {State} from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
-
-// const ExtraBlocks = [
-//   {
-//     NAME: 'Top rated',
-//     MOVIES: (first, second) => second.rating - first.rating,
-//   },
-//   {
-//     NAME: 'Most commented',
-//     MOVIES: (first, second) => second.comments.length - first.comments.length,
-//   },
-// ];
+const EXTRA_BLOCKS_MOVIES_COUNT = 2;
 
 const mainElement = document.querySelector('.main');
 
@@ -68,6 +58,19 @@ class Board {
     remove(this._boardComponent);
   }
 
+  _forEachPresenterForMovie(id, callback) {
+    for (const presenterMap of [this._moviePresenterMap, this._moviePresenterTopRatedMap, this._moviePresenterMostCommentedMap]) {
+      const presenter = presenterMap.get(id);
+      if (presenter) {
+        try {
+          callback(presenter, presenterMap);
+        } catch (err) {
+          continue;
+        }
+      }
+    }
+  }
+
   _getMovies() {
     this._filterType = this._filterModel.getFilter();
     const movies = this._movieModel.getMovies();
@@ -84,6 +87,8 @@ class Board {
 
   _handleModechange() {
     this._moviePresenterMap.forEach((presenter) => presenter.resetView());
+    this._moviePresenterTopRatedMap.forEach((presenter) => presenter.resetView());
+    this._moviePresenterMostCommentedMap.forEach((presenter) => presenter.resetView());
   }
 
   _handleSortChange(sortType) {
@@ -98,7 +103,7 @@ class Board {
   }
 
   _renderSort() {
-    if(this._sortComponent !== null) {
+    if (this._sortComponent !== null) {
       remove(this._sortComponent);
       this._sortComponent = null;
     }
@@ -108,15 +113,16 @@ class Board {
     render(this._boardContainer, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderMovieCard(movie) {
-    const movieContainer = this._filmListComponent.getElement().querySelector('.films-list__container');
-    const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
+  _renderMovieCard(movie, container, presenterMap) {
+    const moviePresenter = new MoviePresenter(container, this._handleViewAction, this._handleModechange, this._api);
     moviePresenter.init(movie);
-    this._moviePresenterMap.set(movie.id, moviePresenter);
+    presenterMap.set(movie.id, moviePresenter);
+    return moviePresenter;
   }
 
   _renderMovieCards(movies) {
-    movies.forEach((movie) => this._renderMovieCard(movie));
+    const movieContainer = this._filmListComponent.getElement().querySelector('.films-list__container');
+    movies.forEach((movie) => this._renderMovieCard(movie, movieContainer, this._moviePresenterMap));
   }
 
   _clearMovieList() {
@@ -138,7 +144,7 @@ class Board {
 
   _handleShowMoreButtonClick() {
     const movieCount = this._getMovies().length;
-    const newRenderMovieCount = Math.min(movieCount, this._renderedMoviesCount + SHOW_MORE_MOVIES_BUTTON_STEP);
+    const newRenderMovieCount = this._renderedMoviesCount + SHOW_MORE_MOVIES_BUTTON_STEP;
     const movies = this._getMovies().slice(this._renderedMoviesCount, newRenderMovieCount);
 
     this._renderMovieCards(movies);
@@ -150,7 +156,7 @@ class Board {
   }
 
   _renderShowMoreButton() {
-    if(this._showMoreButtonComponent !== null) {
+    if (this._showMoreButtonComponent !== null) {
       this._showMoreButtonComponent = null;
     }
 
@@ -167,70 +173,32 @@ class Board {
       case UserAction.UPDATE_MOVIE:
         this._api.updateMovie(updatedData)
           .then((response) => this._movieModel.updateMovie(updateType, response))
-          .catch(() => {throw new Error('Ошибка обновления карточки фильма');});
+          .catch(() => {
+            throw new Error('Ошибка обновления карточки фильма');
+          });
         break;
       case UserAction.ADD_COMMENT:
-        if(this._moviePresenterMap.has(updatedData.movieId)) {
-          this._moviePresenterMap.get(updatedData.movieId).setViewState(State.ADDING);
-        }
-        if(this._moviePresenterMostCommentedMap.has(updatedData.movieId)) {
-          this._moviePresenterMostCommentedMap.get(updatedData.movieId).setViewState(State.ADDING);
-        }
-        if(this._moviePresenterTopRatedMap.has(updatedData.movieId)) {
-          this._moviePresenterTopRatedMap.get(updatedData.movieId).setViewState(State.ADDING);
-        }
+        this._forEachPresenterForMovie(updatedData.movieId, (presenter) => presenter.setViewState(State.ADDING));
         this._api.addComment(updatedData)
           .then((response) => {
             this._movieModel.addComment(updateType, response);
-            if(this._moviePresenterMap.has(newData.movieId)) {
-              this._moviePresenterMap.get(newData.movieId).reset();
-            }
-            if(this._moviePresenterMostCommentedMap.has(newData.movieId)) {
-              this._moviePresenterMostCommentedMap.get(newData.movieId).reset();
-            }
-            if(this._moviePresenterTopRatedMap.has(newData.movieId)) {
-              this._moviePresenterTopRatedMap.get(newData.movieId).reset();
-            }
+            this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.reset());
             this._reRenderExtraCommentsBlocks();
           })
           .catch(() => {
-            if(this._moviePresenterMap.has(newData.movieId)) {
-              this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
-            }
-            if(this._moviePresenterMostCommentedMap.has(newData.movieId)) {
-              this._moviePresenterMostCommentedMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
-            }
-            if(this._moviePresenterTopRatedMap.has(newData.movieId)) {
-              this._moviePresenterTopRatedMap.get(newData.movieId).setViewState(State.ABORTING_ADDING);
-            }
+            this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.setViewState(State.ABORTING_ADDING));
             throw new Error('Ошибка добавления коментария');
           });
         break;
       case UserAction.DELETE_COMMENT:
-        if(this._moviePresenterMap.has(newData.movieId)) {
-          this._moviePresenterMap.get(newData.movieId).setViewState(State.DELETING);
-        }
-        if(this._moviePresenterMostCommentedMap.has(newData.movieId)) {
-          this._moviePresenterMostCommentedMap.get(newData.movieId).setViewState(State.DELETING);
-        }
-        if(this._moviePresenterTopRatedMap.has(newData.movieId)) {
-          this._moviePresenterTopRatedMap.get(newData.movieId).setViewState(State.DELETING);
-        }
+        this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.setViewState(State.DELETING));
         this._api.deleteComment(updatedData)
           .then(() => {
             this._movieModel.deleteComment(updateType, updatedData);
             this._reRenderExtraCommentsBlocks();
           })
           .catch(() => {
-            if(this._moviePresenterMap.has(newData.movieId)) {
-              this._moviePresenterMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
-            }
-            if(this._moviePresenterMostCommentedMap.has(newData.movieId)) {
-              this._moviePresenterMostCommentedMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
-            }
-            if(this._moviePresenterTopRatedMap.has(newData.movieId)) {
-              this._moviePresenterTopRatedMap.get(newData.movieId).setViewState(State.ABORTING_DELETING);
-            }
+            this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.setViewState(State.ABORTING_DELETING));
             throw new Error('Ошибка удаления коментария');
           });
         break;
@@ -240,44 +208,24 @@ class Board {
   _handleModelEvent(updateType, updatedData) {
     switch (updateType) {
       case UpdateType.PATCH:
-        if(this._moviePresenterMap.has(updatedData.id)) {
-          this._moviePresenterMap.get(updatedData.id).init(updatedData);
-        }
-        if(this._moviePresenterMostCommentedMap.has(updatedData.id)) {
-          this._moviePresenterMostCommentedMap.get(updatedData.id).init(updatedData);
-        }
-        if(this._moviePresenterTopRatedMap.has(updatedData.id)) {
-          this._moviePresenterTopRatedMap.get(updatedData.id).init(updatedData);
-        }
+        this._forEachPresenterForMovie(updatedData.id, (presenter) => presenter.init(updatedData));
         break;
       case UpdateType.MINOR: {
-        let isPopupOpened;
-        if(this._moviePresenterMap.has(updatedData.id)) {
-          isPopupOpened = this._moviePresenterMap.get(updatedData.id).isPopupOpened();
-        }
-        if(this._moviePresenterMostCommentedMap.has(updatedData.id)) {
-          isPopupOpened = this._moviePresenterMostCommentedMap.get(updatedData.id).isPopupOpened();
-        }
-        if(this._moviePresenterTopRatedMap.has(updatedData.id)) {
-          isPopupOpened = this._moviePresenterTopRatedMap.get(updatedData.id).isPopupOpened();
-        }
+        const isPopupOpened = [this._moviePresenterMap, this._moviePresenterMostCommentedMap, this._moviePresenterTopRatedMap]
+          .some((presenterMap) => {
+            const presenter = presenterMap.get(updatedData.id);
+            if (presenter) {
+              return presenter.isPopupOpened();
+            }
+            return false;
+          });
+
         this._clearBoard();
         this._renderBoard();
 
-        let moviePresenter;
-        if(this._moviePresenterMap.has(updatedData.id)) {
-          moviePresenter = this._moviePresenterMap.get(updatedData.id);
-        }
-        if(this._moviePresenterMostCommentedMap.has(updatedData.id)) {
-          moviePresenter = this._moviePresenterMostCommentedMap.get(updatedData.id);
-        }
-        if(this._moviePresenterTopRatedMap.has(updatedData.id)) {
-          moviePresenter = this._moviePresenterTopRatedMap.get(updatedData.id);
-        }
-        if(!moviePresenter){
-          moviePresenter = new MoviePresenter(null, this._handleViewAction, this._handleModechange, this._api);
-          moviePresenter.init(updatedData);
-          this._moviePresenterMap.set(updatedData.id, moviePresenter);
+        let moviePresenter = this._moviePresenterMap.get(updatedData.id);
+        if (!moviePresenter) {
+          moviePresenter = this._renderMovieCard(updatedData, null, this._moviePresenterMap);
         }
         if (moviePresenter && isPopupOpened) {
           moviePresenter.openPopup();
@@ -297,8 +245,6 @@ class Board {
   }
 
   _clearBoard({resetRenderedTaskCount = false, resetSortType = false} = {}) {
-    const movieCount = this._getMovies().length;
-
     this._moviePresenterMap.forEach((presenter) => presenter.destroy());
     this._moviePresenterMostCommentedMap.forEach((presenter) => presenter.destroy());
     this._moviePresenterTopRatedMap.forEach((presenter) => presenter.destroy());
@@ -312,10 +258,10 @@ class Board {
     remove(this._extraTopRatedBlockComponent);
     remove(this._extraMostCommentedBlock);
 
-    if(this._noMoviesComponent) {
+    if (this._noMoviesComponent) {
       remove(this._noMoviesComponent);
     }
-    this._renderedMoviesCount = resetRenderedTaskCount ? SHOW_MORE_MOVIES_BUTTON_STEP : Math.min(movieCount, this._renderedMoviesCount);
+    this._renderedMoviesCount = resetRenderedTaskCount ? SHOW_MORE_MOVIES_BUTTON_STEP : this._renderedMoviesCount;
     if (resetSortType) {
       this._currentSort = SortButton.DEFAULT;
     }
@@ -330,32 +276,24 @@ class Board {
 
     const allMovies = this._movieModel.getMovies();
     const extraBlockMovies = allMovies.slice().sort((first, second) => second.rating - first.rating);
-    if(extraBlockMovies.every((movie) => movie.rating === 0)) {
+    if (extraBlockMovies.every((movie) => movie.rating === 0)) {
       return;
     }
 
     render(this._boardComponent, this._extraTopRatedBlockComponent, RenderPosition.BEFOREEND); // 1 Extra block
-    extraBlockMovies.slice(0, 2).forEach((movie) => {
-      const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
-      moviePresenter.init(movie);
-      this._moviePresenterTopRatedMap.set(movie.id, moviePresenter);
-    });
+    extraBlockMovies.slice(0, EXTRA_BLOCKS_MOVIES_COUNT).forEach((movie) => this._renderMovieCard(movie, movieContainer, this._moviePresenterTopRatedMap));
   }
 
   _renderMostCommentedBlock() {
     const movieContainer = this._extraMostCommentedBlock.getElement().querySelector('.films-list__container');
     const allMovies = this._movieModel.getMovies();
     const extraBlockMovies = allMovies.slice().sort((first, second) => second.comments.length - first.comments.length);
-    if(extraBlockMovies.every((movie) => movie.comments.length === 0)) {
+    if (extraBlockMovies.every((movie) => movie.comments.length === 0)) {
       return;
     }
 
     render(this._boardComponent, this._extraMostCommentedBlock, RenderPosition.BEFOREEND); // 2 Extra block
-    extraBlockMovies.slice(0, 2).forEach((movie) => {
-      const moviePresenter = new MoviePresenter(movieContainer, this._handleViewAction, this._handleModechange, this._api);
-      moviePresenter.init(movie);
-      this._moviePresenterMostCommentedMap.set(movie.id, moviePresenter);
-    });
+    extraBlockMovies.slice(0, EXTRA_BLOCKS_MOVIES_COUNT).forEach((movie) => this._renderMovieCard(movie, movieContainer, this._moviePresenterTopRatedMap));
   }
 
   _reRenderExtraCommentsBlocks() {
@@ -364,7 +302,7 @@ class Board {
   }
 
   _renderBoard() {
-    if(this._isLoading) {
+    if (this._isLoading) {
       this._renderLoading();
       return;
     }
@@ -372,7 +310,7 @@ class Board {
     const movies = this._getMovies();
     const moviesCount = movies.length;
 
-    if(moviesCount === 0) {
+    if (moviesCount === 0) {
       this._renderNoMovies();
       return;
     }
@@ -381,11 +319,11 @@ class Board {
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._filmListComponent, RenderPosition.BEFOREEND);
 
-    this._renderMovieCards(movies.slice(0, Math.min(moviesCount, this._renderedMoviesCount)));
+    this._renderMovieCards(movies.slice(0, this._renderedMoviesCount));
     this._renderTopRatedBlock();
     this._renderMostCommentedBlock();
 
-    if(moviesCount > this._renderedMoviesCount) {
+    if (moviesCount > this._renderedMoviesCount) {
       this._renderShowMoreButton();
     }
   }
