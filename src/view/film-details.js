@@ -195,11 +195,14 @@ class MovieDetails extends SmartView {
   shakeComment(callback) {
     const deletingCommentId = this._data.deletingCommentId;
     const selector = `li[id='${deletingCommentId}']`;
-    this.getElement().querySelector(selector).style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    setTimeout(() => {
-      this.getElement().style.animation = '';
-      callback();
-    }, SHAKE_ANIMATION_TIMEOUT);
+    const commentToShake = this.getElement().querySelector(selector);
+    if(commentToShake) {
+      commentToShake.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+      setTimeout(() => {
+        this.getElement().style.animation = '';
+        callback();
+      }, SHAKE_ANIMATION_TIMEOUT);
+    }
   }
 
   getTemplate() {

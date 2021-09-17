@@ -62,11 +62,7 @@ class Board {
     for (const presenterMap of [this._moviePresenterMap, this._moviePresenterTopRatedMap, this._moviePresenterMostCommentedMap]) {
       const presenter = presenterMap.get(id);
       if (presenter) {
-        try {
-          callback(presenter, presenterMap);
-        } catch (err) {
-          continue;
-        }
+        callback(presenter, presenterMap);
       }
     }
   }
