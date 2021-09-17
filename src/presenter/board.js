@@ -58,7 +58,7 @@ class Board {
     remove(this._boardComponent);
   }
 
-  _forEachPresenterForMovie(id, callback) {
+  _handlePresenterMapAction(id, callback) {
     for (const presenterMap of [this._moviePresenterMap, this._moviePresenterTopRatedMap, this._moviePresenterMostCommentedMap]) {
       const presenter = presenterMap.get(id);
       if (presenter) {
@@ -178,27 +178,27 @@ class Board {
           });
         break;
       case UserAction.ADD_COMMENT:
-        this._forEachPresenterForMovie(updatedData.movieId, (presenter) => presenter.setViewState(State.ADDING));
+        this._handlePresenterMapAction(updatedData.movieId, (presenter) => presenter.setViewState(State.ADDING));
         this._api.addComment(updatedData)
           .then((response) => {
             this._movieModel.addComment(updateType, response);
-            this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.reset());
+            this._handlePresenterMapAction(newData.movieId, (presenter) => presenter.reset());
             this._reRenderExtraCommentsBlocks();
           })
           .catch(() => {
-            this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.setViewState(State.ABORTING_ADDING));
+            this._handlePresenterMapAction(newData.movieId, (presenter) => presenter.setViewState(State.ABORTING_ADDING));
             throw new Error('Ошибка добавления коментария');
           });
         break;
       case UserAction.DELETE_COMMENT:
-        this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.setViewState(State.DELETING));
+        this._handlePresenterMapAction(newData.movieId, (presenter) => presenter.setViewState(State.DELETING));
         this._api.deleteComment(updatedData)
           .then(() => {
             this._movieModel.deleteComment(updateType, updatedData);
             this._reRenderExtraCommentsBlocks();
           })
           .catch(() => {
-            this._forEachPresenterForMovie(newData.movieId, (presenter) => presenter.setViewState(State.ABORTING_DELETING));
+            this._handlePresenterMapAction(newData.movieId, (presenter) => presenter.setViewState(State.ABORTING_DELETING));
             throw new Error('Ошибка удаления коментария');
           });
         break;
@@ -208,7 +208,7 @@ class Board {
   _handleModelEvent(updateType, updatedData) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._forEachPresenterForMovie(updatedData.id, (presenter) => presenter.init(updatedData));
+        this._handlePresenterMapAction(updatedData.id, (presenter) => presenter.init(updatedData));
         break;
       case UpdateType.MINOR: {
         const isPopupOpened = [this._moviePresenterMap, this._moviePresenterMostCommentedMap, this._moviePresenterTopRatedMap]
