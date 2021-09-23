@@ -1,4 +1,4 @@
-import MovieModel from './model/movie.js';
+import MovieModel from '../model/movie.js';
 
 const Links = {
   MOVIES: 'movies',

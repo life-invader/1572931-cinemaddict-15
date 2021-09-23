@@ -7,7 +7,7 @@ import BoardPresenter from './presenter/board.js';
 import MenuFilterPresenter from './presenter/menu.js';
 import MovieModel from './model/movie.js';
 import MenuFilterModel from './model/menu-filter.js';
-import Api from './api.js';
+import Api from './api/api.js';
 
 const AUTHORIZATION = 'Basic kgji4783jcfigdf';
 const END_POINT = 'https://15.ecmascript.pages.academy/cinemaddict';
@@ -55,3 +55,7 @@ api.getMovies()
     movieModel.setMovies(UpdateType.INIT, []);
     throw new Error('Ошибка');
   });
+
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
