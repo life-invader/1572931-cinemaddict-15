@@ -80,4 +80,6 @@ const sortByDate = (firstMovie, secondMovie) => dayjs(secondMovie.details.releas
 
 const sortByrating = (firstMovie, secondMovie) => secondMovie.rating - firstMovie.rating;
 
-export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, replace, sortByDate, sortByrating};
+const isOnline = () => window.navigator.onLine;
+
+export {RenderPosition, render, createElement, remove, getRandomInteger, randomFloat, replace, sortByDate, sortByrating, isOnline};

@@ -43,7 +43,6 @@ class Api {
   getComments(movieId) {
     return this._load({url: `${Links.COMMENTS}/${movieId}`})
       .then(Api.toJSON)
-      .then((comments) => comments)
       .catch(() => {throw new Error('Ошибка получения списка комментариев');});
   }
 
@@ -102,6 +101,16 @@ class Api {
 
   static catchError(err) {
     throw err;
+  }
+
+  sync(data) {
+    return this._load({
+      url: 'movies/sync',
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.toJSON);
   }
 }
 

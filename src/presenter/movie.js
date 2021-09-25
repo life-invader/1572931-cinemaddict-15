@@ -2,6 +2,8 @@ import MovieCardView from '../view/movie-card.js'; // Карточка филь�
 import MovieDetailsView from '../view/film-details.js'; // Показ подробной информации о фильме
 import {render, RenderPosition, remove, replace} from '../js/utils.js';
 import {UserAction, UpdateType} from '../js/const.js';
+import {isOnline} from '../js/utils.js';
+import {toast} from '../js/toast.js';
 
 export const State = {
   ADDING: 'ADDING',
@@ -153,18 +155,38 @@ class Movie {
   }
 
   _handleFavouriteButtonClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit movie offline');
+      return;
+    }
+
     this._updateData(UserAction.UPDATE_MOVIE, Object.assign({}, this._movie, {isFavourite: !this._movie.isFavourite}), UpdateType.MINOR);
   }
 
   _handleAddToWatchlistButtonClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit movie offline');
+      return;
+    }
+
     this._updateData(UserAction.UPDATE_MOVIE, Object.assign({}, this._movie, {isInWatchList: !this._movie.isInWatchList}), UpdateType.MINOR);
   }
 
   _handleMarkAsWatchedButtonClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit movie offline');
+      return;
+    }
+
     this._updateData(UserAction.UPDATE_MOVIE, Object.assign({}, this._movie, {isWatched: !this._movie.isWatched}), UpdateType.MINOR);
   }
 
   _handleCommentDeleteClick(commentId) {
+    if (!isOnline()) {
+      toast('You can\'t delete comments offline');
+      return;
+    }
+
     const commentToDelete = {
       commentId: commentId,
       movieId: this._movie.id,
@@ -175,6 +197,11 @@ class Movie {
   }
 
   _handleAddNewComment(text, emotion) {
+    if (!isOnline()) {
+      toast('You can\'t add comments offline');
+      return;
+    }
+
     const newComment = {
       comment: text,
       emotion: emotion,

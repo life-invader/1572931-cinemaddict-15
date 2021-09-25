@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'cinemaaddict';
-const CACHE_VER = 'v1.0';
+const CACHE_VER = 'v1';
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VER}`;
 
 const HTTP_STATUS_OK = 200;

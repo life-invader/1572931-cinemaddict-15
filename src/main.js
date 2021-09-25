@@ -8,11 +8,20 @@ import MenuFilterPresenter from './presenter/menu.js';
 import MovieModel from './model/movie.js';
 import MenuFilterModel from './model/menu-filter.js';
 import Api from './api/api.js';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
+// import {isOnline} from './js/utils.js';
+// import {toast} from './js/toast.js';
 
 const AUTHORIZATION = 'Basic kgji4783jcfigdf';
 const END_POINT = 'https://15.ecmascript.pages.academy/cinemaddict';
+const STORE_PREFIX = 'cinemaaddict-localstorage';
+const STORE_VER = 'v1';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const headerElement = document.querySelector('.header');
 const mainElement = document.querySelector('.main');
@@ -20,7 +29,7 @@ const footerElement = document.querySelector('.footer');
 
 const menuFilterModel = new MenuFilterModel();
 const movieModel = new MovieModel();
-const boardPresenter = new BoardPresenter(mainElement, movieModel, menuFilterModel, api);
+const boardPresenter = new BoardPresenter(mainElement, movieModel, menuFilterModel, apiWithProvider);
 const menuFilterPresenter = new MenuFilterPresenter(mainElement, movieModel, menuFilterModel);
 
 
@@ -47,7 +56,7 @@ const handleUserStatisticsClick = (menuItem = 'statistics') => {
 menuFilterPresenter.init(handleUserStatisticsClick);
 boardPresenter.init();
 
-api.getMovies()
+apiWithProvider.getMovies()
   .then((movies) => {
     movieModel.setMovies(UpdateType.INIT, movies);
   })
@@ -58,4 +67,13 @@ api.getMovies()
 
 window.addEventListener('load', () => {
   navigator.serviceWorker.register('/sw.js');
+});
+
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  apiWithProvider.sync();
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
 });
