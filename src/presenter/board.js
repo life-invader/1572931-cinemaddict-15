@@ -1,15 +1,15 @@
 import BoardView from '../view/board.js'; // Поле с фильмами
 import FilmListView from '../view/film-list.js'; // главный контейнер для карточек фильмов и кнопки
-import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на случай отсутсвия фильмов
+import EmptyFilmListView from '../view/empty-list.js'; // Заглушка на случай отсутствия фильмов
 import FilmListExtraView from '../view/film-list-extra.js'; // Дополнительный блок
 import FilmListExtraCommentsView from '../view/film-list-extra-comments.js'; // Дополнительный блок
 import SortView from '../view/sort.js';
 import LoadingView from '../view/loading.js';
 import ShowMoreButtonView from '../view/show-more-button.js'; // Кнопка показать еще
 import UserStatisticsView from '../view/user-statistics.js'; // Статистика пользователя
-import {render, RenderPosition, remove, sortByDate, sortByrating} from '../js/utils.js';
-import {SortButton, UpdateType, UserAction, Filter} from '../js/const.js';
-import MoviePresenter, {State} from './movie.js';
+import { render, RenderPosition, remove, sortByDate, sortByrating } from '../js/utils.js';
+import { SortButton, UpdateType, UserAction, Filter } from '../js/const.js';
+import MoviePresenter, { State } from './movie.js';
 
 const SHOW_MORE_MOVIES_BUTTON_STEP = 5;
 const EXTRA_BLOCKS_MOVIES_COUNT = 2;
@@ -53,7 +53,7 @@ class Board {
   }
 
   destroy() {
-    this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
+    this._clearBoard({ resetRenderedTaskCount: true, resetSortType: true });
 
     remove(this._boardComponent);
   }
@@ -94,7 +94,7 @@ class Board {
 
     this._currentSort = sortType;
 
-    this._clearBoard({resetRenderedTaskCount: true});
+    this._clearBoard({ resetRenderedTaskCount: true });
     this._renderBoard();
   }
 
@@ -229,7 +229,7 @@ class Board {
       }
         break;
       case UpdateType.MAJOR:
-        this._clearBoard({resetRenderedTaskCount: true, resetSortType: true});
+        this._clearBoard({ resetRenderedTaskCount: true, resetSortType: true });
         this._renderBoard();
         break;
       case UpdateType.INIT:
@@ -240,7 +240,7 @@ class Board {
     }
   }
 
-  _clearBoard({resetRenderedTaskCount = false, resetSortType = false} = {}) {
+  _clearBoard({ resetRenderedTaskCount = false, resetSortType = false } = {}) {
     this._moviePresenterMap.forEach((presenter) => presenter.destroy());
     this._moviePresenterMostCommentedMap.forEach((presenter) => presenter.destroy());
     this._moviePresenterTopRatedMap.forEach((presenter) => presenter.destroy());
